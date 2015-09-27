@@ -962,7 +962,7 @@ stock SQL::CountTables(connectionHandle = 1)
 	return rows;
 }
 
-#undef SQL_INVALID_UPDATE_SLOT
+#undef SQL_INVALID_HANDLE
 #undef SQL_MAX_TABLE_NAME
 #undef SQL_MAX_HANDLES
 #undef SQL_Warning
