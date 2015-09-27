@@ -81,7 +81,7 @@
 
 #define SQL_MAX_TABLE_NAME 					(64)
 #define SQL_MAX_QUERY_LENGTH				(4096)
-#define SQL_INVALID_UPDATE_SLOT				(-1)
+#define SQL_INVALID_HANDLE					(-1)
 #define SQL_FORM_LENGTH						(128)
 #define SQL:: 	SQL_
 #define SQL_Warning(%0)      		(printf("[MYSQL] - WARNING: " %0))
@@ -166,7 +166,7 @@ stock SQL::GetIntEntry(const table[], const field[], const column[], columnID, c
 		}
 		else
 		{
-			return -1;
+			int = -1;
 		}
 		cache_delete(result);
 	}
@@ -192,7 +192,7 @@ stock Float:SQL::GetFloatEntry(const table[], const field[], const column[], col
 		}
 		else
 		{
-			return 0.0;
+			int = 0.0;
 		}
 		cache_delete(result);
 	}
@@ -209,12 +209,13 @@ stock SQL::GetStringEntry(const table[], const field[], const column[], columnID
 		{
 			cache_get_field_content(0, field, SQL::upd_form, connectionHandle, sizeof(SQL::upd_form));
 			strcpy(dest, SQL::upd_form, len);
+			cache_delete(result);
 		}
 		else
 		{
+			cache_delete(result);
 			return 0;
 		}
-		cache_delete(result);
 	}
 	return 1;
 }	
@@ -229,12 +230,13 @@ stock SQL::GetStringEntryEx(const table[], const field[], const column[], const 
 		{
 			cache_get_field_content(0, field, SQL::upd_form, connectionHandle, sizeof(SQL::upd_form));
 			strcpy(dest, SQL::upd_form, len);
+			cache_delete(result);
 		}
 		else
 		{
+			cache_delete(result);
 			return 0;
 		}
-		cache_delete(result);
 	}
 	return 1;
 }	
@@ -252,7 +254,7 @@ stock SQL::GetIntEntryEx(const table[], const field[], const column[], scolumn[]
 		}
 		else
 		{
-			return -1;
+			int = -1;
 		}
 		cache_delete(result);
 	}
@@ -271,7 +273,7 @@ stock Float:SQL::GetFloatEntryEx(const table[], const field[], const column[], s
 		}
 		else
 		{
-			return -1.0;
+			int = -1.0;
 		}
 		cache_delete(result);
 	}
