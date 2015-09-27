@@ -117,7 +117,7 @@ static stock SQL::GetFreeUpdatingSlot()
 	{
 		i++;
 	}
-	if (i == sizeof (SQL::UsedHandle)) return SQL_INVALID_UPDATE_SLOT;
+	if (i == sizeof (SQL::UsedHandle)) return SQL_INVALID_HANDLE;
 	return i;
 }
 static stock SQL::IsValidUpdatingSlot(handle)
@@ -284,19 +284,19 @@ stock SQL::CreateTable(const tablename[], connectionHandle = 1)
 	if(connectionHandle == 0)
 	{
 		SQL_Error("(SQL::CreateTable) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(tablename) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::CreateTable) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_create;
 	strcpy(SQL::upd_table[i], tablename);
@@ -405,24 +405,24 @@ stock SQL::OpenTable_Read(const table[], const column[], columnID, connectionHan
 	if(connectionHandle == 0)
 	{
 		SQL_Error("(SQL::OpenTable) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::OpenTable) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
 		SQL_Error("(SQL::OpenTable) No format has been entered. Format example: (pID)");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_read;
 	SQL::upd_connectionHandle[i] = connectionHandle;
@@ -434,31 +434,31 @@ stock SQL::OpenTable_Read(const table[], const column[], columnID, connectionHan
 		SQL::UsedHandle[i] = true;
 		return i;
 	}
-	return SQL_INVALID_UPDATE_SLOT;
+	return SQL_INVALID_HANDLE;
 }
 stock SQL::OpenTable_ReadEx(const table[], const column[], columnID[], connectionHandle = 1)
 {
 	if(connectionHandle == 0)
 	{
 		SQL_Error("(SQL::OpenTable_ReadEx) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::OpenTable_ReadEx) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
 		SQL_Error("(SQL::OpenTable_ReadEx) No format has been entered. Format example: (pID)");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_read;
 	SQL::upd_connectionHandle[i] = connectionHandle;
@@ -470,7 +470,7 @@ stock SQL::OpenTable_ReadEx(const table[], const column[], columnID[], connectio
 		SQL::UsedHandle[i] = true;
 		return i;
 	}
-	return SQL_INVALID_UPDATE_SLOT;
+	return SQL_INVALID_HANDLE;
 }
 stock SQL::ReadInt(handle, const field[], &dest)
 {
@@ -514,24 +514,24 @@ stock SQL::OpenTable_Update(const table[], const column[], columnID, connectionH
 	if(connectionHandle == 0)
 	{
 		SQL_Error("(SQL::OpenTable) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::OpenTable) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
 		SQL_Error("(SQL::OpenTable) No format has been entered. Format example: (pID)");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_update;
 	strcpy(SQL::upd_table[i], table);
@@ -547,24 +547,24 @@ stock SQL::OpenTable_UpdateEx(const table[], const column[], columnID[], connect
 	if(connectionHandle == 0)
 	{
 		SQL_Error("(SQL::OpenTable_UpdateEx) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::OpenTable_UpdateEx) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
 		SQL_Error("(SQL::OpenTable_UpdateEx) No format has been entered. Format example: (pID)");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_update;
 	strcpy(SQL::upd_table[i], table);
@@ -813,19 +813,19 @@ stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, conne
 	if(!connectionHandle)
 	{
 		SQL_Error("(SQL::OpenTable_Insert) No active connection.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
 		SQL_Error("(SQL::OpenTable_Insert) Invalid table length.");
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	} 
 	new 
 		i = SQL::GetFreeUpdatingSlot()
 	;
-	if(i == SQL_INVALID_UPDATE_SLOT) 
+	if(i == SQL_INVALID_HANDLE) 
 	{
-		return SQL_INVALID_UPDATE_SLOT;
+		return SQL_INVALID_HANDLE;
 	}
 	SQL::upd_type[i] = SQL::type_insert;
 	strcpy(SQL::upd_table[i], table);
