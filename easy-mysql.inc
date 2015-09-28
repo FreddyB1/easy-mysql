@@ -122,7 +122,7 @@ static stock SQL::GetFreeUpdatingSlot()
 }
 static stock SQL::IsValidUpdatingSlot(handle)
 {
-	return SQL::UsedHandle[handle] ? 1 : 0;
+	return SQL::UsedHandle[handle];
 }
 stock SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = true, pool_size = 2)
 {
