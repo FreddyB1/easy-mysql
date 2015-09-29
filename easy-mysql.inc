@@ -4,7 +4,9 @@
 
 	Credits:
 	* BlueG - MySQL
-
+	
+	Version: 2.0
+	
 	(c) Copyright 2015
  	* This file is provided as is (no warranties).
 
@@ -26,6 +28,9 @@
 	native SQL::ReadString(handle, const field[], dest[], len = sizeof(dest));
 	native SQL::OpenTable_Update(const table[], const column[], columnID, connectionHandle = 1);
 	native SQL::OpenTable_UpdateEx(const table[], const column[], columnID[], connectionHandle = 1);
+	native SQL::Open(SQL::qtypes:type, const table[], const column[] = "", columnID = -1, connectionHandle = 1);
+	native SQL::ToggleAutoIncrement(handle, bool:toggle);
+	native SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", columnID[] = "", connectionHandle = 1)
 	native SQL::UpdateIntEntry(handle, const field[], value);
 	native SQL::UpdateFloatEntry(handle, const field[], Float:value);
 	native SQL::UpdateStringEntry(handle, const field[], const value[], bool:use_real_escape = true);
@@ -44,6 +49,20 @@
 	native SQL::CountRows(const tablename[], connectionHandle = 1);
 	native SQL::CountTables(connectionHandle = 1);
 	native SQL::DropTable(const tablename[], connectionHandle = 1);
+	
+	v2.0
+	
+	native SQL::Open(SQL::qtypes:type, const table[], const column[] = "", columnID = -1, connectionHandle = 1);
+	native SQL::ToggleAutoIncrement(handle, bool:toggle);
+	native SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", columnID[] = "", connectionHandle = 1)
+	
+	
+	The following functions replace Insert and Update functions:
+	
+	SQL::WriteFloat(handle, const field[], Float:value);
+	SQL::WriteInt(handle, const field[], Float:value);
+	SQL::WriteString(handle, const field[], const value[]);
+	
 	
 	This include is mainly for people without experience with MySQL as it simplifies its usage.
 */
@@ -89,7 +108,7 @@
 #define SQL_Notice(%0)				(printf("[MYSQL] - NOTICE: " %0))
 
 enum SQL::datatypes {SQL_TYPE_INT, SQL_TYPE_VCHAR, SQL_TYPE_FLOAT} 
-enum SQL::qtypes {SQL::type_update, SQL::type_create, SQL::type_insert, SQL_type_delete, SQL::type_read}
+enum SQL::qtypes {SQL::UPDATE, SQL::CREATE, SQL::INSERT, SQL_TYPE_DELETE, SQL::READ}
 
 static stock
 	bool:SQL::UsedHandle[SQL_MAX_HANDLES],
@@ -104,7 +123,7 @@ static stock
 	SQL::qtypes:SQL::upd_type[SQL_MAX_HANDLES],
 	SQL::upd_pos[SQL_MAX_HANDLES],
 	Cache:SQL::ReadCache[SQL_MAX_HANDLES],
-	SQL::upd_useautoincrement[SQL_MAX_HANDLES],
+	bool:SQL::upd_useautoincrement[SQL_MAX_HANDLES],
 	SQL::primarykey[SQL_MAX_HANDLES][64],
 	SQL::isset_primarykey[SQL_MAX_HANDLES]
 	
@@ -145,6 +164,62 @@ stock SQL::DeleteRow(const table[], const column[], columnID, connectionHandle =
 {
 	format(SQL::upd_form, sizeof(SQL::upd_form), "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, columnID);
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
+	return 1;
+}
+stock SQL::Open(SQL::qtypes:type, const table[], const column[] = "", columnID = -1, connectionHandle = 1)
+{
+	new handle;
+	switch(type)
+	{
+		case SQL::CREATE:
+		{
+			handle = SQL::CreateTable(table, connectionHandle);
+		}
+		case SQL::READ:
+		{
+			handle = SQL::OpenTable_Read(table, column, columnID, connectionHandle);
+		}
+		case SQL::INSERT:
+		{
+			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
+		}
+		case SQL::UPDATE:
+		{
+			handle = SQL::OpenTable_Update(table, column, columnID, connectionHandle);
+		}
+	}
+	return handle;
+}
+stock SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", columnID[] = "", connectionHandle = 1)
+{
+	new handle;
+	switch(type)
+	{
+		case SQL::CREATE:
+		{
+			handle = SQL::CreateTable(table, connectionHandle);
+		}
+		case SQL::READ:
+		{
+			handle = SQL::OpenTable_ReadEx(table, column, columnID, connectionHandle);
+		}
+		case SQL::INSERT:
+		{
+			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
+		}
+		case SQL::UPDATE:
+		{
+			handle = SQL::OpenTable_UpdateEx(table, column, columnID, connectionHandle);
+		}
+	}
+	return handle;
+}
+
+stock SQL::ToggleAutoIncrement(handle, bool:toggle)
+{
+	if(!SQL::IsValidUpdatingSlot(handle)) return 0;
+	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
+	SQL::upd_useautoincrement[handle] = toggle;
 	return 1;
 }
 stock SQL::DeleteRowEx(const table[], const column[], columnID[], connectionHandle = 1)
@@ -298,7 +373,7 @@ stock SQL::CreateTable(const tablename[], connectionHandle = 1)
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_create;
+	SQL::upd_type[i] = SQL::CREATE;
 	strcpy(SQL::upd_table[i], tablename);
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	format(SQL::upd_query[i], SQL_MAX_QUERY_LENGTH, "CREATE TABLE %s (", SQL::upd_table[i]);
@@ -314,7 +389,7 @@ stock SQL::AddTableEntry(handle, const field[], SQL::datatypes: type = SQL_TYPE_
 		SQL_Error("(SQL::AddTableEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_create) return 0;
+	if(SQL::upd_type[handle] != SQL::CREATE) return 0;
 	if(SQL::isset_primarykey[handle] && setprimary == true)
 	{
 		SQL_Error("(SQL::AddTableEntry) A primary field was created already. There can only be one primary field! [Key %s]", field);
@@ -424,7 +499,7 @@ stock SQL::OpenTable_Read(const table[], const column[], columnID, connectionHan
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_read;
+	SQL::upd_type[i] = SQL::READ;
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` WHERE `%s` = '%d' ", table, column, columnID);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
@@ -460,7 +535,7 @@ stock SQL::OpenTable_ReadEx(const table[], const column[], columnID[], connectio
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_read;
+	SQL::upd_type[i] = SQL::READ;
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` WHERE `%s` = '%s' ", table, column, columnID);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
@@ -479,7 +554,7 @@ stock SQL::ReadInt(handle, const field[], &dest)
 		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_read) return 0;
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
 	dest = cache_get_field_content_int(0, field, SQL::upd_connectionHandle[handle]);
 	SQL::upd_datacount[handle]++;
 	return 1;
@@ -491,7 +566,7 @@ stock SQL::ReadFloat(handle, const field[], &Float:dest)
 		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_read) return 0;
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
 	dest = cache_get_field_content_float(0, field, SQL::upd_connectionHandle[handle]);
 	SQL::upd_datacount[handle]++;
 	return 1;
@@ -503,7 +578,7 @@ stock SQL::ReadString(handle, const field[], dest[], len = sizeof(dest))
 		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_read) return 0;
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
 	cache_get_field_content(0, field, dest, SQL::upd_connectionHandle[handle], len+1);
 	SQL::upd_datacount[handle]++;
 	return 1;
@@ -533,7 +608,7 @@ stock SQL::OpenTable_Update(const table[], const column[], columnID, connectionH
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_update;
+	SQL::upd_type[i] = SQL::UPDATE;
 	strcpy(SQL::upd_table[i], table);
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	format(SQL::upd_query[i], SQL_MAX_QUERY_LENGTH, "UPDATE `%s` SET ", SQL::upd_table[i]);
@@ -566,7 +641,7 @@ stock SQL::OpenTable_UpdateEx(const table[], const column[], columnID[], connect
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_update;
+	SQL::upd_type[i] = SQL::UPDATE;
 	strcpy(SQL::upd_table[i], table);
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	format(SQL::upd_query[i], SQL_MAX_QUERY_LENGTH, "UPDATE `%s` SET ", SQL::upd_table[i]);
@@ -582,13 +657,73 @@ stock SQL::UpdateIntEntry(handle, const field[], value)
 		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_update) return 0;
+	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "`%s`='%i',", field, value);
 	strcat(SQL::upd_query[handle], SQL::upd_form);
 	SQL::upd_datacount[handle]++;
 	return 1;
 }
-
+stock SQL::WriteInt(handle, const field[], value)
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::WriteInt) Invalid handle. Make sure you used (SQL::Open) first.");
+		return 0;
+	}
+	switch(SQL::upd_type[handle])
+	{
+		case SQL::UPDATE:
+		{
+			return SQL::UpdateIntEntry(handle, field, value);
+		}
+		case SQL::INSERT:
+		{
+			return SQL::InsertIntEntry(handle, field, value);
+		}
+	}
+	return 0;
+	
+}
+stock SQL::WriteFloat(handle, const field[], Float:value)
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::WriteFloat) Invalid handle. Make sure you used (SQL::Open) first.");
+		return 0;
+	}
+	switch(SQL::upd_type[handle])
+	{
+		case SQL::UPDATE:
+		{
+			return SQL::UpdateFloatEntry(handle, field, value);
+		}
+		case SQL::INSERT:
+		{
+			return SQL::InsertFloatEntry(handle, field, value);
+		}
+	}
+	return 0;
+}
+stock SQL::WriteString(handle, const field[], const value[])
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::WriteFloat) Invalid handle. Make sure you used (SQL::Open) first.");
+		return 0;
+	}
+	switch(SQL::upd_type[handle])
+	{
+		case SQL::UPDATE:
+		{
+			return SQL::UpdateStringEntry(handle, field, value);
+		}
+		case SQL::INSERT:
+		{
+			return SQL::InsertStringEntry(handle, field, value);
+		}
+	}
+	return 0;
+}
 stock SQL::UpdateFloatEntry(handle, const field[], Float:value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
@@ -596,7 +731,7 @@ stock SQL::UpdateFloatEntry(handle, const field[], Float:value)
 		SQL_Error("(SQL::UpdateFloatEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_update) return 0;
+	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "`%s`='%f',", field, value);
 	strcat(SQL::upd_query[handle], SQL::upd_form);
 	SQL::upd_datacount[handle]++;
@@ -609,7 +744,7 @@ stock SQL::UpdateStringEntry(handle, const field[], const value[], bool:use_real
 		SQL_Error("(SQL::UpdateStringEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_update) return 0;
+	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
 	if(use_real_escape == true)
 	{
 		new escape[SQL_FORM_LENGTH];
@@ -636,7 +771,7 @@ stock SQL::Close(handle)
 		SQL_Error("(SQL::Close) No data has been updated/inserted/deleted.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] == SQL::type_update)
+	if(SQL::upd_type[handle] == SQL::UPDATE)
 	{
 		//Remove last comma 
 		new pos = strlen(SQL::upd_query[handle])-1;
@@ -651,7 +786,7 @@ stock SQL::Close(handle)
 		SQL::upd_datacount[handle] = 0;
 		SQL::UsedHandle[handle] = false;
 	}
-	else if(SQL::upd_type[handle] == SQL::type_create)
+	else if(SQL::upd_type[handle] == SQL::CREATE)
 	{
 		new pos = strlen(SQL::upd_query[handle])-1;
 		SQL::upd_query[handle][pos] = ' ';
@@ -672,7 +807,7 @@ stock SQL::Close(handle)
 		SQL::UsedHandle[handle] = false;
 		
 	}
-	else if(SQL::upd_type[handle] == SQL::type_insert)
+	else if(SQL::upd_type[handle] == SQL::INSERT)
 	{
 		new pos = strlen(SQL::upd_query[handle])-1;
 		SQL::upd_query[handle][pos] = ')';
@@ -684,7 +819,7 @@ stock SQL::Close(handle)
 		SQL::upd_query_2[handle][0] = '\0';
 		SQL::upd_rowidentifier[handle][0] = '\0';
 		SQL::upd_datacount[handle] = 0;
-		if(SQL::upd_useautoincrement[handle] == 1)
+		if(SQL::upd_useautoincrement[handle] == true)
 		{
 			new Cache:result;
 			result = mysql_query(SQL::upd_connectionHandle[handle], SQL::upd_query[handle]);
@@ -704,7 +839,7 @@ stock SQL::Close(handle)
 		}
 		
 	}
-	else if(SQL::upd_type[handle] == SQL::type_read)
+	else if(SQL::upd_type[handle] == SQL::READ)
 	{
 		if(cache_is_valid(SQL::ReadCache[handle]))
 		{
@@ -827,7 +962,7 @@ stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, conne
 	{
 		return SQL_INVALID_HANDLE;
 	}
-	SQL::upd_type[i] = SQL::type_insert;
+	SQL::upd_type[i] = SQL::INSERT;
 	strcpy(SQL::upd_table[i], table);
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	format(SQL::upd_query[i], SQL_MAX_QUERY_LENGTH, "INSERT INTO `%s` (", SQL::upd_table[i]);
@@ -835,11 +970,11 @@ stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, conne
 	SQL::upd_datacount[i] = 0;
 	if(use_autoincrement == true)
 	{
-		SQL::upd_useautoincrement[i] = 1;
+		SQL::upd_useautoincrement[i] = true;
 	}
 	else
 	{
-		SQL::upd_useautoincrement[i] = 0;
+		SQL::upd_useautoincrement[i] = false;
 	}
 	SQL::UsedHandle[i] = true;
 	return i;
@@ -851,7 +986,7 @@ stock SQL::InsertIntEntry(handle, const field[], value)
 		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_insert) return 0;
+	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "`%s`,", field);
 	strcat(SQL::upd_query[handle], SQL::upd_form);
 	format(SQL::upd_form, sizeof(SQL::upd_form), "'%i',", value);
@@ -866,7 +1001,7 @@ stock SQL::InsertFloatEntry(handle, const field[], Float:value)
 		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_insert) return 0;
+	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "`%s`,", field);
 	strcat(SQL::upd_query[handle], SQL::upd_form);
 	format(SQL::upd_form, sizeof(SQL::upd_form), "'%f',", value);
@@ -881,7 +1016,7 @@ stock SQL::InsertStringEntry(handle, const field[], const value[], bool:use_real
 		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
 		return 0;
 	}
-	if(SQL::upd_type[handle] != SQL::type_insert) return 0;
+	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "`%s`,", field);
 	strcat(SQL::upd_query[handle], SQL::upd_form);
 	if(use_real_escape == true)
