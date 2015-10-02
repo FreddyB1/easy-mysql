@@ -836,6 +836,7 @@ stock SQL::Close(handle)
 		else
 		{
 			mysql_tquery(SQL::upd_connectionHandle[handle], SQL::upd_query[handle], "", "");
+			SQL::UsedHandle[handle] = false;
 		}
 		
 	}
