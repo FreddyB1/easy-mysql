@@ -113,3 +113,26 @@ SQL::DeleteRowEx("players", "p_name", "TestName");
 //Get an user's score from a table called 'players', supposing the score column is called 'p_score', the identifier column is called 'p_id' and the player's id is 4.
 new player_score = SQL::GetIntEntry("players", "p_score", "p_id", 4);
 ```
+
+###Flaot:SQL::GetFloatEntry
+
+#####Description: 
+      Gets a float field in a defined row.
+####Parameters:
+```pawn
+(const table[], const field[], const column[], columnID, connectionHandle = 1);
+```
+* `const table[]`                 The target MySQL table.
+* `const field[]`                 The field to retrieve the integer from.
+* `const column[]`                The column that identifies the selected row.
+* `columnID`                    The ID in the column that identifies the selected row.
+* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
+
+
+####Return values:
+    The retrieved float, 0 if no float was found.
+
+```pawn
+//Get an user's x_pos from a table called 'players', supposing the posx column is called 'p_X', the identifier column is called 'p_id' and the player's id is 4.
+new Float:playerX = SQL::GetFloatEntry("players", "p_X", "p_id", 4);
+```
