@@ -66,3 +66,26 @@ public OnGameModeInit()
 //Delete an user from a table called 'players', supposing the column is called 'p_id' and the player's column ID is 5.
 SQL::DeleteRow("players", "p_id", 5);
 ```
+
+
+###SQL::DeleteRowEx
+
+#####Description: 
+      Deletes a row in the specified table.
+####Parameters:
+```pawn
+(const table[], const column[], columnID[], connectionHandle = 1);
+```
+* `const table[]`                 The target MySQL table.
+* `const column[]`                The column in the MySQL table.
+* `columnID[]`                    The string that identifies the target row you want to delete(might be his name?).
+* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
+
+
+####Return values:
+    Always returns 1.
+
+```pawn
+//Delete an user from a table called 'players', supposing the column is called 'p_name' and the player's name is TestName.
+SQL::DeleteRowEx("players", "p_name", "TestName");
+```
