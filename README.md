@@ -89,3 +89,27 @@ SQL::DeleteRow("players", "p_id", 5);
 //Delete an user from a table called 'players', supposing the column is called 'p_name' and the player's name is TestName.
 SQL::DeleteRowEx("players", "p_name", "TestName");
 ```
+
+
+###SQL::GetIntEntry
+
+#####Description: 
+      Gets an integer field in a defined row.
+####Parameters:
+```pawn
+(const table[], const field[], const column[], columnID, connectionHandle = 1);
+```
+* `const table[]`                 The target MySQL table.
+* `const field[]`                 The field to retrieve the integer from.
+* `const column[]`                The column that identifies the selected row.
+* `columnID`                    The ID in the column that identifies the selected row.
+* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
+
+
+####Return values:
+    The retrieved integer, 0 if no integer was found.
+
+```pawn
+//Get an user's score from a table called 'players', supposing the score column is called 'p_score', the identifier column is called 'p_id' and the player's id is 4.
+new player_score = SQL::GetIntEntry("players", "p_score", "p_id", 4);
+```
