@@ -1076,6 +1076,13 @@ stock SQL::DropTable(const table[], connectionHandle = 1)
 	mysql_tquery(connectionHandle, query, "", "");
 	return 0;
 }
+stock SQL::DeleteColumn(const table[], const column[], connectionHandle = 1)
+{
+	new query[SQL_FORM_LENGTH];
+	format(query, sizeof(query), "ALTER TABLE %s DROP COLUMN %s;", table, column);
+	mysql_tquery(connectionHandle, query, "", "");
+	return 0;
+}
 stock SQL::RowExists(const table[], const column[], columnID[], connectionHandle = 1)
 {
 	new query[SQL_FORM_LENGTH], Cache:result;
