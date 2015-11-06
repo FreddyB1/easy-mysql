@@ -99,10 +99,10 @@
 #endif
 
 #define SQL_MAX_TABLE_NAME 					(64)
-#define SQL_MAX_QUERY_LENGTH				(4096)
+#define SQL_MAX_QUERY_LENGTH				(8192)
 #define SQL_INVALID_HANDLE					(-1)
 #define SQL_FORM_LENGTH						(128)
-#define SQL:: 	SQL_
+#define SQL:: 	SQL_T
 #define SQL_Warning(%0)      		(printf("[MYSQL] - WARNING: " %0))
 #define SQL_Error(%0)        		(printf("[MYSQL] - ERROR: " %0))
 #define SQL_Notice(%0)				(printf("[MYSQL] - NOTICE: " %0))
@@ -160,9 +160,42 @@ stock SQL::Connect(const host[], const user[], const database[], const password[
 	}
 	return SQL::mc;
 }
+stock SQL::Begin(connectionHandle = 1)
+{
+	mysql_tquery(connectionHandle, "BEGIN", "", "");
+	return 1;
+}
+stock SQL::Commit(connectionHandle = 1)
+{
+	mysql_tquery(connectionHandle, "COMMIT", "", "");
+	return 1;
+}
 stock SQL::DeleteRow(const table[], const column[], columnID, connectionHandle = 1)
 {
 	format(SQL::upd_form, sizeof(SQL::upd_form), "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, columnID);
+	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
+	return 1;
+}
+stock SQL::DeleteRow2(connectionHandle = 1, const table[], const column[], type = 'i', {Float,_}:...)
+{
+	switch (type)
+	{
+		case 'd', 'i': mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, getarg(4));
+		case 's':
+		{
+			new i_ArgLoop = -1;
+			new i_Extract[128];
+			while (++i_ArgLoop != 0x100)
+			{
+				if (i_ArgLoop < 128)
+				{
+					i_Extract[i_ArgLoop] = getarg(4, i_ArgLoop);
+				}
+			}
+			mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%e' ", table, column, i_Extract);
+		}
+		case 'f':  mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%f' ", table, column, getarg(4));
+	}
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
@@ -230,19 +263,12 @@ stock SQL::DeleteRowEx(const table[], const column[], columnID[], connectionHand
 }
 stock SQL::GetIntEntry(const table[], const field[], const column[], columnID, connectionHandle = 1)
 {
-	new Cache:result, int;
+	new Cache:result, int = 0;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, columnID);
 	result = mysql_query(connectionHandle, SQL::upd_form);
 	if (result) 
 	{
-		if (cache_get_row_count() == 1)
-		{
-			int = cache_get_field_content_int(0, field, connectionHandle);
-		}
-		else
-		{
-			int = -1;
-		}
+		if (cache_get_row_count()) int = cache_get_field_content_int(0, field, connectionHandle);
 		cache_delete(result);
 	}
 	return int;
@@ -272,6 +298,27 @@ stock Float:SQL::GetFloatEntry(const table[], const field[], const column[], col
 		cache_delete(result);
 	}
 	return int;
+}	
+stock SQL::t_GetStringEntry(const table[], const field[], const column[], columnID, connectionHandle = 1)
+{
+	new Cache:result;
+	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, columnID);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	SQL::upd_form[0] = EOS;
+	if (result) 
+	{
+		if (cache_get_row_count() == 1)
+		{
+			cache_get_field_content(0, field, SQL::upd_form, connectionHandle, sizeof(SQL::upd_form));
+			cache_delete(result);
+		}
+		else
+		{
+			cache_delete(result);
+			return SQL::upd_form;
+		}
+	}
+	return SQL::upd_form;
 }	
 stock SQL::GetStringEntry(const table[], const field[], const column[], columnID, dest[], len = sizeof(dest), connectionHandle = 1)
 {
@@ -315,7 +362,27 @@ stock SQL::GetStringEntryEx(const table[], const field[], const column[], const 
 	}
 	return 1;
 }	
-
+stock SQL::t_GetStringEntryEx(const table[], const field[], const column[], const scolumn[], connectionHandle = 1)
+{
+	new Cache:result;
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, column, scolumn);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	SQL::upd_form[0] = EOS;
+	if (result) 
+	{
+		if (cache_get_row_count() == 1)
+		{
+			cache_get_field_content(0, field, SQL::upd_form, connectionHandle, sizeof(SQL::upd_form));
+			cache_delete(result);
+		}
+		else
+		{
+			cache_delete(result);
+			return SQL::upd_form,;
+		}
+	}
+	return SQL::upd_form,;
+}
 stock SQL::GetIntEntryEx(const table[], const field[], const column[], scolumn[], connectionHandle = 1)
 {
 	new Cache:result, int;
@@ -814,7 +881,7 @@ stock SQL::Close(handle)
 		pos = strlen(SQL::upd_query_2[handle])-1;
 		SQL::upd_query_2[handle][pos] = ' ';
 		strcat(SQL::upd_query_2[handle], ");");
-		strcat(SQL_upd_query[handle], SQL_upd_query_2[handle]);
+		strcat(SQL::upd_query[handle], SQL::upd_query_2[handle]);
 		SQL::upd_table[handle][0] = '\0';
 		SQL::upd_query_2[handle][0] = '\0';
 		SQL::upd_rowidentifier[handle][0] = '\0';
@@ -1073,13 +1140,6 @@ stock SQL::DropTable(const table[], connectionHandle = 1)
 {
 	new query[SQL_FORM_LENGTH];
 	format(query, sizeof(query), "DROP TABLE %s;", table);
-	mysql_tquery(connectionHandle, query, "", "");
-	return 0;
-}
-stock SQL::DeleteColumn(const table[], const column[], connectionHandle = 1)
-{
-	new query[SQL_FORM_LENGTH];
-	format(query, sizeof(query), "ALTER TABLE %s DROP COLUMN %s;", table, column);
 	mysql_tquery(connectionHandle, query, "", "");
 	return 0;
 }
