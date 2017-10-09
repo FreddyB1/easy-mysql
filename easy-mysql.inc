@@ -1,6 +1,6 @@
 /*
 	Author: (creator)
- 	* ThePhenix AKA ThreeKingz
+ 	* Freddy Borja - ThePhenix AKA ThreeKingz
 
 	Credits:
 	* BlueG - MySQL
