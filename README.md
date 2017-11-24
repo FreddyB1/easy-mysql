@@ -16,7 +16,7 @@ Go to the [releases page](https://github.com/ThreeKingz/easy-mysql/releases/tag/
 ```
 #Requirements:
 
-In order to use this include, you require the [MySQL Plugin](https://github.com/pBlueG/SA-MP-MySQL/releases) by BlueG.
+In order to use this include, you require the latest version of the [MySQL Plugin](https://github.com/pBlueG/SA-MP-MySQL/releases) by BlueG.
 
 #Functions and their usage:
 
