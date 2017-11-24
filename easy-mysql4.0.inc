@@ -9,7 +9,7 @@
 	
 	Version: 4.0
 	
-	(c) Copyright 2015
+	(c) Copyright 2017
  	* This file is provided as is (no warranties).
 
 	native MySQL::SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = true, pool_size = 2);
