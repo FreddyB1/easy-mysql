@@ -624,18 +624,18 @@ stock SQL::AddTableColumn(handle, const column_name[], SQL::datatypes: type = SQ
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::AddTableEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::AddTableColumn) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::CREATE) return 0;
 	if(SQL::isset_primarykey[handle] && setprimary == true)
 	{
-		SQL_Error("(SQL::AddTableEntry) A primary column was created already. There can only be one primary column! [Key %s]", column_name);
+		SQL_Error("(SQL::AddTableColumn) A primary column was created already. There can only be one primary column! [Key %s]", column_name);
 		return 0;
 	}
 	if(auto_increment == true && type == SQL_TYPE_VCHAR)
 	{
-		SQL_Error("(SQL::AddTableEntry) You can't set auto increment if the type is varchar! [Key %s]", column_name);
+		SQL_Error("(SQL::AddTableColumn) You can't set auto increment if the type is varchar! [Key %s]", column_name);
 		return 0;
 	}
 	switch(type)
@@ -725,7 +725,7 @@ stock SQL::ReadFloat(handle, const field[], &Float:dest)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
+		SQL_Error("(SQL::ReadFloat) Invalid handle. Make sure you opened the table first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::READ) return 0;
@@ -738,7 +738,7 @@ stock SQL::ReadString(handle, const field[], dest[], len = sizeof(dest))
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
+		SQL_Error("(SQL::ReadString) Invalid handle. Make sure you opened the table first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::READ) return 0;
@@ -764,7 +764,7 @@ stock SQL::UpdateIntEntry(handle, const field[], value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
@@ -818,7 +818,7 @@ stock SQL::WriteString(handle, const field[], const value[], bool:use_real_escap
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::WriteFloat) Invalid handle. Make sure you used (SQL::Open) first.");
+		SQL_Error("(SQL::WriteString) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	switch(SQL::upd_type[handle])
@@ -838,7 +838,7 @@ stock SQL::UpdateFloatEntry(handle, const field[], Float:value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateFloatEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::UpdateFloatEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
@@ -851,7 +851,7 @@ stock SQL::UpdateStringEntry(handle, const field[], const value[], bool:use_real
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateStringEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::UpdateStringEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::UPDATE) return 0;
@@ -1104,7 +1104,7 @@ static stock SQL::InsertIntEntry(handle, const field[], value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::InsertIntEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
@@ -1119,7 +1119,7 @@ static stock SQL::InsertFloatEntry(handle, const field[], Float:value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::InsertFloatEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
@@ -1134,7 +1134,7 @@ static stock SQL::InsertStringEntry(handle, const field[], const value[], bool:u
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
-		SQL_Error("(SQL::UpdateIntEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		SQL_Error("(SQL::InsertStringEntry) Invalid handle. Make sure you used (SQL::Open) first.");
 		return 0;
 	}
 	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
