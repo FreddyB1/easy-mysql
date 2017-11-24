@@ -1,75 +1,96 @@
 /*
-	Author: (creator)
- 	* ThreeKingz - ThePhenix
 
-	Credits:
-	* BlueG - MySQL
-	
-	Updated to MySQL R40+
-	
-	Version: 4.0
-	
-	(c) Copyright 2017
- 	* This file is provided as is (no warranties).
+Copyright [2017] [ThreeKingz - Freddy Borja]
 
-	native MySQL::SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = true, pool_size = 2);
-	native SQL::DeleteRow(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::DeleteRowEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::GetIntEntry(const table[], const field[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native Float:SQL::GetFloatEntry(const table[], const field[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::GetStringEntry(const table[], const field[], const column[], rowID, dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::GetStringEntryEx(const table[], const field[], const column[], const scolumn[], dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-	native SQL::GetIntEntryEx(const table[], const field[], const column[], scolumn[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native Float:SQL::GetFloatEntryEx(const table[], const field[], const column[], scolumn[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::AddTableEntry(handle, const field[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false);
-	native SQL::OpenTable_Read(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::OpenTable_ReadEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::ReadInt(handle, const field[], &dest);
-	native SQL::ReadFloat(handle, const field[], &Float:dest);
-	native SQL::ReadString(handle, const field[], dest[], len = sizeof(dest));
-	native SQL::OpenTable_Update(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::OpenTable_UpdateEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::Open(SQL::qtypes:type, const table[], const column[] = "", rowID = -1, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::ToggleAutoIncrement(handle, bool:toggle);
-	native SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", rowID[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-	native SQL::UpdateIntEntry(handle, const field[], value);
-	native SQL::UpdateFloatEntry(handle, const field[], Float:value);
-	native SQL::UpdateStringEntry(handle, const field[], const value[], bool:use_real_escape = true);
-	native SQL::Close(handle);
-	native SQL::SetIntEntry(const table[], const field[], value, const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::SetIntEntryEx(const table[], const field[], value, const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::SetFloatEntry(const table[], const field[], Float:value, const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::SetFloatEntryEx(const table[], const field[], Float:value, const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::SetStringEntry(const table[], const field[], const value[], const column[], rowID, bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::SetStringEntryEx(const table[], const field[], const value[], const column[], rowID[], bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::OpenTable_Insert(const table[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::InsertIntEntry(handle, const field[], value);
-	native SQL::InsertFloatEntry(handle, const field[], Float:value);
-	native SQL::InsertStringEntry(handle, const field[], const value[], bool:use_real_escape = true);
-	native SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::CountRows(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::CountTables(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::DropTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	
-	v2.0
-	
-	native SQL::Open(SQL::qtypes:type, const table[], const column[] = "", rowID = -1, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
-	native SQL::ToggleAutoIncrement(handle, bool:toggle);
-	native SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", rowID[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-	
-	
-	The following functions replace Insert and Update functions:
-	
-	SQL::WriteFloat(handle, const field[], Float:value);
-	SQL::WriteInt(handle, const field[], Float:value);
-	SQL::WriteString(handle, const field[], const value[]);
-	
-	
-	This include is mainly for people without experience with MySQL as it simplifies its usage.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+//Updated to MySQL R41-4 by madinnat0r - BlueG
+
+
+//Establish connection
+native MySQL:SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = false, pool_size = 0);
+native SQL::Disconnect(MySQL:handle = MYSQL_DEFAULT_HANDLE);
+
+
+//Open a new type of handle
+//qtypes {SQL::UPDATE, SQL::CREATE, SQL::INSERT, SQL_TYPE_DELETE, SQL::READ}
+native SQL::Open(SQL::qtypes:type, const table[], const rowid_column[] = "", rowID = -1, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+native SQL::OpenEx(SQL::qtypes:type, const table[], const rowid_column[] = "", rowID[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+native SQL::ToggleAutoIncrement(handle, bool:toggle);
+
+
+//Getting a single entry from a single row - don't use this if you want to read data from multiple rows
+
+native SQL::GetIntEntry(const table[], const field[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+native Float:SQL::GetFloatEntry(const table[], const field[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::GetStringEntry(const table[], const field[], const rowid_column[], rowID, dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
+native SQL::GetIntEntryEx(const table[], const field[], const rowid_column[], sRowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native Float:SQL::GetFloatEntryEx(const table[], const field[], const rowid_column[], sRowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::GetStringEntryEx(const table[], const field[], const rowid_column[], const scolumn[], dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
+//updates the value of a specific field for a single row: - don't use this for multiple rows
+native SQL::SetIntEntry(const table[], const field[], value, const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+native SQL::SetStringEntry(const table[], const field[], const string[], const rowid_column[], rowID, bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::SetFloatEntry(const table[], const field[], Float:value, const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
+native SQL::SetFloatEntryEx(const table[], const field[], Float:value, const rowid_column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+stock SQL::SetIntEntryEx(const table[], const field[], value, const rowid_column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetStringEntryEx(const table[], const field[], const string[], const rowid_column[], rowID[], bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+
+//adds a new column to a table
+native SQL::AddTableColumn(handle, const column_name[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false);
+
+//read data, SQL::Open or SQL::OpenEx must return a valid handle
+native SQL::ReadInt(handle, const field[], &dest);
+native SQL::ReadFloat(handle, const field[], &Float:dest);
+native SQL::ReadString(handle, const field[], dest[], len = sizeof(dest));
+//"write" data (insert and update)
+native SQL::WriteInt(handle, const field[], value);
+native SQL::WriteFloat(handle, const field[], Float:value);
+native SQL::WriteString(handle, const field[], const value[]);
+
+//Closes any opened handle
+native SQL::Close(handle);
+
+
+//Table functions
+
+native bool:SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::CountRows(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::AddForeignKey(const o_table[], const f_table[], const o_key[], const f_key[], const db[], SQL::ftypes:on_delete, SQL::ftypes:on_update, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::CountTables(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::AddIndex(const table[], const key[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::DropTable(const table[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
+//Check if a row exists
+native bool:SQL::RowExistsEx(const table[], const rowid_column[], const rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native bool:SQL::RowExists(const table[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
+//delete a row
+native SQL::DeleteRow(const table[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::DeleteRowEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::DeleteRowExArgs(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE, const table[], const rowid_column[], type = 'i', {Float,_}:...);
+
+
+//Transactions
+native SQL::Begin(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+native SQL::Commit(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE);
+
 */
 
-#if defined _tksql_included//Avoid including it again!
+#if defined _tksql_included
 	#endinput
 #endif
 #define _tksql_included
@@ -96,23 +117,30 @@
 #define strcpy(%0,%1) \
 	strcat((%0[0] = '\0', %0), %1)
 #endif
-#if !defined SQL_MAX_HANDLES
-	#define SQL_MAX_HANDLES              (3)//Maximun concurrent handles running.
-#endif
 
+
+
+#if !defined SQL_MAX_HANDLES
+	#define SQL_MAX_HANDLES              	(3)//Maximun concurrent handles running.
+#endif
 #define SQL_MAX_TABLE_NAME 					(64)
 #define SQL_MAX_INDEXES						(4)
 #define SQL_MAX_QUERY_LENGTH				(8192)
 #define SQL_INVALID_HANDLE					(-1)
 #define SQL_FORM_LENGTH						(128)
-#define SQL:: 	SQL_T
-#define SQL_Warning(%0)      		(printf("[MYSQL] - WARNING: " %0))
-#define SQL_Error(%0)        		(printf("[MYSQL] - ERROR: " %0))
-#define SQL_Notice(%0)				(printf("[MYSQL] - NOTICE: " %0))
+#define SQL:: 								SQL_T //class like syntax
+#define SQL_Warning(%0)      		(printf("[easy-mysql] - WARNING: " %0))
+#define SQL_Error(%0)        		(printf("[easy-mysql] - ERROR: " %0))
+#define SQL_Notice(%0)				(printf("[easy-mysql] - NOTICE: " %0))
 
+
+
+/*==============================================================================
+Internal variables and functions
+================================================================================*/
 
 enum SQL::datatypes {SQL_TYPE_INT, SQL_TYPE_VCHAR, SQL_TYPE_FLOAT} 
-enum SQL::qtypes {SQL::UPDATE, SQL::CREATE, SQL::INSERT, SQL_TYPE_DELETE, SQL::READ}
+enum SQL::qtypes {SQL::UPDATE, SQL::CREATE, SQL::INSERT, SQL::READ} //query commands
 enum SQL::ftypes {SQL::CASCADE, SQL::SETNULL, SQL::NOACTION, SQL::RESTRICT}
 
 
@@ -138,6 +166,8 @@ static stock
 	
 ;
 
+
+//Internal functions:
 static stock SQL::GetFreeUpdatingSlot()
 {
 	new i = 0;
@@ -148,6 +178,7 @@ static stock SQL::GetFreeUpdatingSlot()
 	if (i == sizeof (SQL::UsedHandle)) return SQL_INVALID_HANDLE;
 	return i;
 }
+
 static stock SQL::GetFreeIndexSlot(handle)
 {
 	new i = 0;
@@ -158,301 +189,13 @@ static stock SQL::GetFreeIndexSlot(handle)
 	if (i == sizeof (SQL::index_set)) return SQL_INVALID_HANDLE;
 	return i;
 }
+
 static stock SQL::IsValidUpdatingSlot(handle)
 {
 	return SQL::UsedHandle[handle];
-}
-stock MySQL:SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = false, pool_size = 0)
-{
-	if(debugging == true) mysql_log(ERROR | DEBUG);
-	new MySQL:SQL::mc;
-	new MySQLOpt:options = mysql_init_options();
-	mysql_set_option(options, AUTO_RECONNECT, autoreconnect);
-	mysql_set_option(options, POOL_SIZE, pool_size);
-	mysql_set_option(options, SERVER_PORT, port);
-	SQL::mc = mysql_connect(host, user, password, database, options);
-	if(mysql_errno(SQL::mc) != 0)
-	{
-		SQL_Warning("Could not connect to database %s on host %s | user %s and password %s", database, host, user, password);
-	
-	}
-	else
-	{
-	    SQL_Notice("Successfully connected to database!");
-	}
-	return SQL::mc;
-}
-stock SQL::Begin(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	mysql_tquery(connectionHandle, "BEGIN", "", "");
-	return 1;
-}
-stock SQL::Commit(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	mysql_tquery(connectionHandle, "COMMIT", "", "");
-	return 1;
-}
-stock SQL::DeleteRow(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	format(SQL::upd_form, sizeof(SQL::upd_form), "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, rowID);
-	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
-	return 1;
-}
-stock SQL::DeleteRow2(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE, const table[], const column[], type = 'i', {Float,_}:...)
-{
-	switch (type)
-	{
-		case 'd', 'i': mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, getarg(4));
-		case 's':
-		{
-			new i_ArgLoop = -1;
-			new i_Extract[128];
-			while (++i_ArgLoop != 0x100)
-			{
-				if (i_ArgLoop < 128)
-				{
-					i_Extract[i_ArgLoop] = getarg(4, i_ArgLoop);
-				}
-			}
-			mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%e' ", table, column, i_Extract);
-		}
-		case 'f':  mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%f' ", table, column, getarg(4));
-	}
-	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
-	return 1;
-}
-stock SQL::Open(SQL::qtypes:type, const table[], const column[] = "", rowID = -1, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new handle;
-	switch(type)
-	{
-		case SQL::CREATE:
-		{
-			handle = SQL::CreateTable(table, connectionHandle);
-		}
-		case SQL::READ:
-		{
-			handle = SQL::OpenTable_Read(table, column, rowID, connectionHandle);
-		}
-		case SQL::INSERT:
-		{
-			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
-		}
-		case SQL::UPDATE:
-		{
-			handle = SQL::OpenTable_Update(table, column, rowID, connectionHandle);
-		}
-	}
-	return handle;
-}
-stock SQL::OpenEx(SQL::qtypes:type, const table[], const column[] = "", rowID[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new handle;
-	switch(type)
-	{
-		case SQL::CREATE:
-		{
-			handle = SQL::CreateTable(table, connectionHandle);
-		}
-		case SQL::READ:
-		{
-			handle = SQL::OpenTable_ReadEx(table, column, rowID, connectionHandle);
-		}
-		case SQL::INSERT:
-		{
-			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
-		}
-		case SQL::UPDATE:
-		{
-			handle = SQL::OpenTable_UpdateEx(table, column, rowID, connectionHandle);
-		}
-	}
-	return handle;
-}
 
-stock SQL::cache_get_value_name_int(row_idx, const column_name[])
-{
-	new int = 0;
-	cache_get_value_name_int(row_idx, column_name, int);
-	return int;
 }
-stock Float:SQL::cache_get_value_name_float(row_idx, const column_name[])
-{
-	new Float:fval = 0;
-	cache_get_value_name_float(row_idx, column_name, fval);
-	return fval;
-}
-stock SQL::ToggleAutoIncrement(handle, bool:toggle)
-{
-	if(!SQL::IsValidUpdatingSlot(handle)) return 0;
-	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
-	SQL::upd_useautoincrement[handle] = toggle;
-	return 1;
-}
-stock SQL::DeleteRowEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%e' ", table, column, rowID);
-	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
-	return 1;
-}
-stock SQL::GetIntEntry(const table[], const field[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result, int = 0;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, rowID);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(!cache_is_valid(result)) return SQL_Error("(SQL::GetIntEntry) Invalid cache ID.");
-	if (result) 
-	{
-		if (cache_num_rows()) int = SQL::cache_get_value_name_int(0, field);
-		cache_delete(result);
-	}
-	return int;
-}
-stock Float:SQL::GetFloatEntry(const table[], const field[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new 
-		Cache:result, 
-		Float:int
-	;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, rowID);
-	
-	
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(!cache_is_valid(result)) return SQL_Error("(SQL::GetFloatEntry) Invalid cache ID.");
-	if (cache_num_rows())
-	{
-		int = SQL::cache_get_value_name_float(0, field);
-	}
-	else
-	{
-		int = 0.0;
-	}
-	cache_delete(result);
-	return int;
-}	
-stock SQL::t_GetStringEntry(const table[], const field[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, rowID);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	SQL::upd_form[0] = EOS;
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
-			cache_delete(result);
-		}
-		else
-		{
-			cache_delete(result);
-			return SQL::upd_form;
-		}
-	}
-	return SQL::upd_form;
-}	
-stock SQL::GetStringEntry(const table[], const field[], const column[], rowID, dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, column, rowID);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
-			strcpy(dest, SQL::upd_form, len);
-			cache_delete(result);
-		}
-		else
-		{
-			cache_delete(result);
-			return 0;
-		}
-	}
-	return 1;
-}	
-stock SQL::GetStringEntryEx(const table[], const field[], const column[], const scolumn[], dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, column, scolumn);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
-			strcpy(dest, SQL::upd_form, len);
-			cache_delete(result);
-		}
-		else
-		{
-			cache_delete(result);
-			return 0;
-		}
-	}
-	return 1;
-}	
-stock SQL::t_GetStringEntryEx(const table[], const field[], const column[], const scolumn[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, column, scolumn);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	SQL::upd_form[0] = EOS;
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
-			cache_delete(result);
-		}
-		else
-		{
-			cache_delete(result);
-			return SQL::upd_form,;
-		}
-	}
-	return SQL::upd_form,;
-}
-stock SQL::GetIntEntryEx(const table[], const field[], const column[], scolumn[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result, int;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, column, scolumn);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			int = SQL::cache_get_value_name_int(0, field);
-		}
-		else
-		{
-			int = -1;
-		}
-		cache_delete(result);
-	}
-	return int;
-}
-stock Float:SQL::GetFloatEntryEx(const table[], const field[], const column[], scolumn[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
-{
-	new Cache:result, Float:int;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, column, scolumn);
-	result = mysql_query(connectionHandle, SQL::upd_form);
-	if (result) 
-	{
-		if (cache_num_rows() == 1)
-		{
-			int = SQL::cache_get_value_name_int(0, field);
-		}
-		else
-		{
-			int = -1.0;
-		}
-		cache_delete(result);
-	}
-	return int;
-}
-stock SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE) //used internally
 {
 	if(connectionHandle == MYSQL_INVALID_HANDLE)
 	{
@@ -480,121 +223,21 @@ stock SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT
 	SQL::UsedHandle[i] = true;
 	return i;
 }
-stock SQL::AddTableEntry(handle, const field[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false)
-{
-	if(!SQL::IsValidUpdatingSlot(handle))
-	{
-		SQL_Error("(SQL::AddTableEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
-		return 0;
-	}
-	if(SQL::upd_type[handle] != SQL::CREATE) return 0;
-	if(SQL::isset_primarykey[handle] && setprimary == true)
-	{
-		SQL_Error("(SQL::AddTableEntry) A primary field was created already. There can only be one primary field! [Key %s]", field);
-		return 0;
-	}
-	if(auto_increment == true && type == SQL_TYPE_VCHAR)
-	{
-		SQL_Error("(SQL::AddTableEntry) You can't set auto increment if the type is varchar! [Key %s]", field);
-		return 0;
-	}
-	switch(type)
-	{
-		case SQL_TYPE_INT:
-		{
-			if(auto_increment == true && setprimary == false)
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-				SQL::isset_primarykey[handle] = 1;
-				strcpy(SQL::primarykey[handle], field);
-			}
-			else if(auto_increment == true && setprimary == true)
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-				SQL::isset_primarykey[handle] = 1;
-				strcpy(SQL::primarykey[handle], field);
-			}
-			else if(setprimary == true)
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL PRIMARY KEY,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-				SQL::isset_primarykey[handle] = 2;
-				strcpy(SQL::primarykey[handle], field);
-			}
-			else
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int(%d) NOT NULL,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-			}
-		}
-		case SQL_TYPE_VCHAR:
-		{
-			if(auto_increment == true) return 0;
-			if(setprimary == true)
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL PRIMARY KEY,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-				SQL::isset_primarykey[handle] = 2;
-				strcpy(SQL::primarykey[handle], field);
-			}
-			else
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-
-			}
-		}
-		case SQL_TYPE_FLOAT:
-		{
-			if(auto_increment == true) return 0;
-			if(setprimary == true)
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL PRIMARY KEY,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-				SQL::isset_primarykey[handle] = 2;
-				strcpy(SQL::primarykey[handle], field);
-			}
-			else
-			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL,", field, maxlength);
-				strcat(SQL::upd_query[handle], SQL::upd_form);
-				SQL::upd_datacount[handle]++;
-			}
-		}
-	}
-	if(setindex == true)
-	{
-		new indexslot = SQL::GetFreeIndexSlot(handle);
-		if(indexslot == SQL_INVALID_HANDLE) return SQL_Error("(SQL::AddTableEntry) Indexes limit reached. Increase the limit in MAX_INDEXES");
-		SQL::index_set[handle][indexslot] = 1;
-		strcpy(SQL::index[handle][indexslot], field);
-	}
-	return 1;
-}
-stock SQL::OpenTable_Read(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::OpenTable_Read(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(connectionHandle == MYSQL_INVALID_HANDLE)
 	{
-		SQL_Error("(SQL::OpenTable) No active connection.");
+		SQL_Error("(SQL::OpenTable_Read) No active connection.");
 		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
-		SQL_Error("(SQL::OpenTable) Invalid table length.");
+		SQL_Error("(SQL::OpenTable_Read) Invalid table length.");
 		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
-		SQL_Error("(SQL::OpenTable) No format has been entered. Format example: (pID)");
+		SQL_Error("(SQL::OpenTable_Read) No format has been entered. Format example: (pID)");
 		return SQL_INVALID_HANDLE;
 	}
 	new 
@@ -616,7 +259,7 @@ stock SQL::OpenTable_Read(const table[], const column[], rowID, MySQL:connection
 	}
 	return SQL_INVALID_HANDLE;
 }
-stock SQL::OpenTable_ReadEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::OpenTable_ReadEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(connectionHandle == MYSQL_INVALID_HANDLE)
 	{
@@ -652,58 +295,22 @@ stock SQL::OpenTable_ReadEx(const table[], const column[], rowID[], MySQL:connec
 	}
 	return SQL_INVALID_HANDLE;
 }
-stock SQL::ReadInt(handle, const field[], &dest)
-{
-	if(!SQL::IsValidUpdatingSlot(handle))
-	{
-		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
-		return 0;
-	}
-	if(SQL::upd_type[handle] != SQL::READ) return 0;
-	dest = SQL::cache_get_value_name_int(0, field);
-	SQL::upd_datacount[handle]++;
-	return 1;
-}
-stock SQL::ReadFloat(handle, const field[], &Float:dest)
-{
-	if(!SQL::IsValidUpdatingSlot(handle))
-	{
-		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
-		return 0;
-	}
-	if(SQL::upd_type[handle] != SQL::READ) return 0;
-	dest = SQL::cache_get_value_name_float(0, field);
-	SQL::upd_datacount[handle]++;
-	return 1;
-}
-stock SQL::ReadString(handle, const field[], dest[], len = sizeof(dest))
-{
-	if(!SQL::IsValidUpdatingSlot(handle))
-	{
-		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
-		return 0;
-	}
-	if(SQL::upd_type[handle] != SQL::READ) return 0;
-	cache_get_value_name(0, field, dest, len+1);
-	SQL::upd_datacount[handle]++;
-	return 1;
-}
 
-stock SQL::OpenTable_Update(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::OpenTable_Update(const table[], const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(connectionHandle == MYSQL_INVALID_HANDLE)
 	{
-		SQL_Error("(SQL::OpenTable) No active connection.");
+		SQL_Error("(SQL::OpenTable_Update) No active connection.");
 		return SQL_INVALID_HANDLE;
 	} 
 	if(strlen(table) > SQL_MAX_TABLE_NAME)
 	{
-		SQL_Error("(SQL::OpenTable) Invalid table length.");
+		SQL_Error("(SQL::OpenTable_Update) Invalid table length.");
 		return SQL_INVALID_HANDLE;
 	} 
 	if(column[0] == '\0')
 	{
-		SQL_Error("(SQL::OpenTable) No format has been entered. Format example: (pID)");
+		SQL_Error("(SQL::OpenTable_Update) No format has been entered. Format example: (pID)");
 		return SQL_INVALID_HANDLE;
 	}
 	new 
@@ -722,7 +329,7 @@ stock SQL::OpenTable_Update(const table[], const column[], rowID, MySQL:connecti
 	SQL::UsedHandle[i] = true;
 	return i;
 }
-stock SQL::OpenTable_UpdateEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::OpenTable_UpdateEx(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(connectionHandle == MYSQL_INVALID_HANDLE)
 	{
@@ -755,6 +362,404 @@ stock SQL::OpenTable_UpdateEx(const table[], const column[], rowID[], MySQL:conn
 	SQL::UsedHandle[i] = true;
 	return i;
 }
+
+
+/*==============================================================================
+Actual functions
+================================================================================*/
+stock SQL::cache_get_value_name_int(row_idx, const column_name[])
+{
+	new int = 0;
+	cache_get_value_name_int(row_idx, column_name, int);
+	return int;
+}
+stock Float:SQL::cache_get_value_name_float(row_idx, const column_name[])
+{
+	new Float:fval = 0;
+	cache_get_value_name_float(row_idx, column_name, fval);
+	return fval;
+}
+stock MySQL:SQL::Connect(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = false, pool_size = 0)
+{
+	if(debugging == true) mysql_log(ERROR | DEBUG);
+	new MySQL:SQL::mc;
+	new MySQLOpt:options = mysql_init_options();
+	mysql_set_option(options, AUTO_RECONNECT, autoreconnect);
+	mysql_set_option(options, POOL_SIZE, pool_size);
+	mysql_set_option(options, SERVER_PORT, port);
+	SQL::mc = mysql_connect(host, user, password, database, options);
+	if(mysql_errno(SQL::mc) != 0)
+	{
+		SQL_Warning("Could not connect to database %s on host %s | user %s and password %s", database, host, user, password);
+	
+	}
+	else
+	{
+	    SQL_Notice("Successfully connected to database!");
+	}
+	return SQL::mc;
+}
+stock SQL::Disconnect(MySQL:handle = MYSQL_DEFAULT_HANDLE)
+{
+	return mysql_close(handle;
+}
+stock SQL::Begin(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	mysql_tquery(connectionHandle, "BEGIN", "", "");
+	return 1;
+}
+stock SQL::Commit(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	mysql_tquery(connectionHandle, "COMMIT", "", "");
+	return 1;
+}
+stock SQL::DeleteRow(const table[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	format(SQL::upd_form, sizeof(SQL::upd_form), "DELETE FROM `%s` WHERE `%s`='%d' ", table, rowid_column, rowID);
+	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
+	return 1;
+}
+stock SQL::DeleteRowEx(const table[], const rowid_column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%e' ", table, rowid_column, rowID);
+	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
+	return 1;
+}
+stock SQL::DeleteRowExArgs(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE, const table[], const rowid_column[], type = 'i', {Float,_}:...)
+{
+	switch (type)
+	{
+		case 'd', 'i': mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%d' ", table, column, getarg(4));
+		case 's':
+		{
+			new i_ArgLoop = -1;
+			new i_Extract[128];
+			while (++i_ArgLoop != 0x100)
+			{
+				if (i_ArgLoop < 128)
+				{
+					i_Extract[i_ArgLoop] = getarg(4, i_ArgLoop);
+				}
+			}
+			mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%e' ", table, rowid_column, i_Extract);
+		}
+		case 'f':  mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form),  "DELETE FROM `%s` WHERE `%s`='%f' ", table, rowid_column, getarg(4));
+	}
+	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
+	return 1;
+}
+stock SQL::Open(SQL::qtypes:type, const table[], const rowid_column[] = "", rowID = -1, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new handle;
+	switch(type)
+	{
+		case SQL::CREATE:
+		{
+			handle = SQL::CreateTable(table, connectionHandle);
+		}
+		case SQL::READ:
+		{
+			handle = SQL::OpenTable_Read(table, rowid_column, rowID, connectionHandle);
+		}
+		case SQL::INSERT:
+		{
+			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
+		}
+		case SQL::UPDATE:
+		{
+			handle = SQL::OpenTable_Update(table, rowid_column, rowID, connectionHandle);
+		}
+	}
+	return handle;
+}
+stock SQL::OpenEx(SQL::qtypes:type, const table[], const rowid_column[] = "", rowID[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new handle;
+	switch(type)
+	{
+		case SQL::CREATE:
+		{
+			handle = SQL::CreateTable(table, connectionHandle);
+		}
+		case SQL::READ:
+		{
+			handle = SQL::OpenTable_ReadEx(table, rowid_column, rowID, connectionHandle);
+		}
+		case SQL::INSERT:
+		{
+			handle = SQL::OpenTable_Insert(table, false, connectionHandle);
+		}
+		case SQL::UPDATE:
+		{
+			handle = SQL::OpenTable_UpdateEx(table, rowid_column, rowID, connectionHandle);
+		}
+	}
+	return handle;
+}
+stock SQL::ToggleAutoIncrement(handle, bool:toggle)
+{
+	if(!SQL::IsValidUpdatingSlot(handle)) return 0;
+	if(SQL::upd_type[handle] != SQL::INSERT) return 0;
+	SQL::upd_useautoincrement[handle] = toggle;
+	return 1;
+}
+stock SQL::GetIntEntry(const table[], const field[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new Cache:result, int = 0;
+	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, rowid_column, rowID);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if(!cache_is_valid(result)) return SQL_Error("(SQL::GetIntEntry) Invalid cache ID.");
+	if (result) 
+	{
+		if (cache_num_rows()) int = SQL::cache_get_value_name_int(0, field);
+		cache_delete(result);
+	}
+	return int;
+}
+stock Float:SQL::GetFloatEntry(const table[], const field[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new 
+		Cache:result, 
+		Float:int
+	;
+	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, rowid_column, rowID);
+	
+	
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if(!cache_is_valid(result)) return SQL_Error("(SQL::GetFloatEntry) Invalid cache ID.");
+	if (cache_num_rows())
+	{
+		int = SQL::cache_get_value_name_float(0, field);
+	}
+	else
+	{
+		int = 0.0;
+	}
+	cache_delete(result);
+	return int;
+}	
+stock SQL::GetStringEntry(const table[], const field[], const rowid_column[], rowID, dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new Cache:result;
+	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%d' ", field, table, rowid_column, rowID);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if (result) 
+	{
+		if (cache_num_rows() == 1)
+		{
+			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
+			strcpy(dest, SQL::upd_form, len);
+			cache_delete(result);
+		}
+		else
+		{
+			cache_delete(result);
+			return 0;
+		}
+	}
+	return 1;
+}	
+stock SQL::GetStringEntryEx(const table[], const field[], const rowid_column[], const scolumn[], dest[], len = sizeof(dest), MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new Cache:result;
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, rowid_column, scolumn);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if (result) 
+	{
+		if (cache_num_rows() == 1)
+		{
+			cache_get_value_name(0, field, SQL::upd_form, sizeof(SQL::upd_form));
+			strcpy(dest, SQL::upd_form, len);
+			cache_delete(result);
+		}
+		else
+		{
+			cache_delete(result);
+			return 0;
+		}
+	}
+	return 1;
+}	
+
+stock SQL::GetIntEntryEx(const table[], const field[], const rowid_column[], sRowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new Cache:result, int;
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, rowid_column, sRowID);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if (result) 
+	{
+		if (cache_num_rows() == 1)
+		{
+			int = SQL::cache_get_value_name_int(0, field);
+		}
+		else
+		{
+			int = -1;
+		}
+		cache_delete(result);
+	}
+	return int;
+}
+stock Float:SQL::GetFloatEntryEx(const table[], const field[], const rowid_column[], sRowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+{
+	new Cache:result, Float:int;
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`='%e' ", field, table, rowid_column, sRowID);
+	result = mysql_query(connectionHandle, SQL::upd_form);
+	if (result) 
+	{
+		if (cache_num_rows() == 1)
+		{
+			int = SQL::cache_get_value_name_int(0, field);
+		}
+		else
+		{
+			int = -1.0;
+		}
+		cache_delete(result);
+	}
+	return int;
+}
+
+stock SQL::AddTableColumn(handle, const column_name[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false)
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::AddTableEntry) Invalid handle. Make sure you used (SQL::OpenTable) first.");
+		return 0;
+	}
+	if(SQL::upd_type[handle] != SQL::CREATE) return 0;
+	if(SQL::isset_primarykey[handle] && setprimary == true)
+	{
+		SQL_Error("(SQL::AddTableEntry) A primary column was created already. There can only be one primary column! [Key %s]", column_name);
+		return 0;
+	}
+	if(auto_increment == true && type == SQL_TYPE_VCHAR)
+	{
+		SQL_Error("(SQL::AddTableEntry) You can't set auto increment if the type is varchar! [Key %s]", column_name);
+		return 0;
+	}
+	switch(type)
+	{
+		case SQL_TYPE_INT:
+		{
+			if(auto_increment == true && setprimary == false)
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+				SQL::isset_primarykey[handle] = 1;
+				strcpy(SQL::primarykey[handle], column_name);
+			}
+			else if(auto_increment == true && setprimary == true)
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+				SQL::isset_primarykey[handle] = 1;
+				strcpy(SQL::primarykey[handle], column_name);
+			}
+			else if(setprimary == true)
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL PRIMARY KEY,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+				SQL::isset_primarykey[handle] = 2;
+				strcpy(SQL::primarykey[handle], column_name);
+			}
+			else
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int(%d) NOT NULL,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+			}
+		}
+		case SQL_TYPE_VCHAR:
+		{
+			if(auto_increment == true) return 0;
+			if(setprimary == true)
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL PRIMARY KEY,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+				SQL::isset_primarykey[handle] = 2;
+				strcpy(SQL::primarykey[handle], column_name);
+			}
+			else
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+
+			}
+		}
+		case SQL_TYPE_FLOAT:
+		{
+			if(auto_increment == true) return 0;
+			if(setprimary == true)
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL PRIMARY KEY,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+				SQL::isset_primarykey[handle] = 2;
+				strcpy(SQL::primarykey[handle], column_name);
+			}
+			else
+			{
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL,", column_name, maxlength);
+				strcat(SQL::upd_query[handle], SQL::upd_form);
+				SQL::upd_datacount[handle]++;
+			}
+		}
+	}
+	if(setindex == true)
+	{
+		new indexslot = SQL::GetFreeIndexSlot(handle);
+		if(indexslot == SQL_INVALID_HANDLE) return SQL_Error("(SQL::AddTableColumn) Indexes limit reached. Increase the limit in MAX_INDEXES");
+		SQL::index_set[handle][indexslot] = 1;
+		strcpy(SQL::index[handle][indexslot], column_name);
+	}
+	return 1;
+}
+
+stock SQL::ReadFloat(handle, const field[], &Float:dest)
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
+		return 0;
+	}
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
+	dest = SQL::cache_get_value_name_float(0, field);
+	SQL::upd_datacount[handle]++;
+	return 1;
+}
+
+stock SQL::ReadString(handle, const field[], dest[], len = sizeof(dest))
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
+		return 0;
+	}
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
+	cache_get_value_name(0, field, dest, len+1);
+	SQL::upd_datacount[handle]++;
+	return 1;
+}
+
+stock SQL::ReadInt(handle, const field[], &dest)
+{
+	if(!SQL::IsValidUpdatingSlot(handle))
+	{
+		SQL_Error("(SQL::ReadInt) Invalid handle. Make sure you opened the table first.");
+		return 0;
+	}
+	if(SQL::upd_type[handle] != SQL::READ) return 0;
+	dest = SQL::cache_get_value_name_int(0, field);
+	SQL::upd_datacount[handle]++;
+	return 1;
+}
+
 stock SQL::UpdateIntEntry(handle, const field[], value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
@@ -809,7 +814,7 @@ stock SQL::WriteFloat(handle, const field[], Float:value)
 	}
 	return 0;
 }
-stock SQL::WriteString(handle, const field[], const value[])
+stock SQL::WriteString(handle, const field[], const value[], bool:use_real_escape = true)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
@@ -820,11 +825,11 @@ stock SQL::WriteString(handle, const field[], const value[])
 	{
 		case SQL::UPDATE:
 		{
-			return SQL::UpdateStringEntry(handle, field, value);
+			return SQL::UpdateStringEntry(handle, field, value, use_real_escape);
 		}
 		case SQL::INSERT:
 		{
-			return SQL::InsertStringEntry(handle, field, value);
+			return SQL::InsertStringEntry(handle, field, value, use_real_escape);
 		}
 	}
 	return 0;
@@ -965,7 +970,7 @@ stock SQL::Close(handle)
 	}
 	return -1;
 }
-stock SQL::SetIntEntry(const table[], const field[], value, const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetIntEntry(const table[], const field[], value, const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -974,11 +979,11 @@ stock SQL::SetIntEntry(const table[], const field[], value, const column[], rowI
 	} 
 	if(!table[0]) return 0;
 	if(!field[0]) return 0;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%d' WHERE `%s`='%d' ", table, field, value, column, rowID);
+	format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%d' WHERE `%s`='%d' ", table, field, value, rowid_column, rowID);
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::SetIntEntryEx(const table[], const field[], value, const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetIntEntryEx(const table[], const field[], value, const rowid_column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -987,11 +992,11 @@ stock SQL::SetIntEntryEx(const table[], const field[], value, const column[], ro
 	} 
 	if(!table[0]) return 0;
 	if(!field[0]) return 0;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%d' WHERE `%s`='%e' ", table, field, value, column, rowID);
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%d' WHERE `%s`='%e' ", table, field, value, rowid_column, rowID);
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::SetStringEntry(const table[], const field[], const value[], const column[], rowID, bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetStringEntry(const table[], const field[], const value[], const rowid_column[], rowID, bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -1003,16 +1008,16 @@ stock SQL::SetStringEntry(const table[], const field[], const value[], const col
 	if(use_real_escape == true)
 	{
 		//Not using mysql_real_escape_string as the %e specifier is faster.
-		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%e' WHERE `%s`='%d' ", table, field, value, column, rowID);
+		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%e' WHERE `%s`='%d' ", table, field, value, rowid_column, rowID);
 	}
 	else
 	{
-		format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%s' WHERE `%s`='%d' ", table, field, value, column, rowID);
+		format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%s' WHERE `%s`='%d' ", table, field, value, rowid_column, rowID);
 	}
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::SetStringEntryEx(const table[], const field[], const value[], const column[], rowID[], bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetStringEntryEx(const table[], const field[], const value[], const rowid_column[], rowID[], bool:use_real_escape = true, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -1024,16 +1029,16 @@ stock SQL::SetStringEntryEx(const table[], const field[], const value[], const c
 	if(use_real_escape == true)
 	{
 		//Not using mysql_real_escape_string as the %e specifier is faster.
-		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%e' WHERE `%s`='%e' ", table, field, value, column, rowID);
+		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%e' WHERE `%s`='%e' ", table, field, value, rowid_column, rowID);
 	}
 	else
 	{
-		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%s' WHERE `%s`='%e' ", table, field, value, column, rowID);
+		mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%s' WHERE `%s`='%e' ", table, field, value, rowid_column, rowID);
 	}
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::SetFloatEntry(const table[], const field[], Float:value, const column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetFloatEntry(const table[], const field[], Float:value, const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -1042,11 +1047,11 @@ stock SQL::SetFloatEntry(const table[], const field[], Float:value, const column
 	} 
 	if(!table[0]) return 0;
 	if(!field[0]) return 0;
-	format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%f' WHERE `%s`='%d' ", table, field, value, column, rowID);
+	format(SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%f' WHERE `%s`='%d' ", table, field, value, rowid_column, rowID);
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::SetFloatEntryEx(const table[], const field[], Float:value, const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::SetFloatEntryEx(const table[], const field[], Float:value, const rowid_column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -1055,11 +1060,11 @@ stock SQL::SetFloatEntryEx(const table[], const field[], Float:value, const colu
 	} 
 	if(!table[0]) return 0;
 	if(!field[0]) return 0;
-	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%f' WHERE `%s`='%e' ", table, field, value, column, rowID);
+	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%f' WHERE `%s`='%e' ", table, field, value, rowid_column, rowID);
 	mysql_tquery(connectionHandle, SQL::upd_form, "", "");
 	return 1;
 }
-stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!connectionHandle)
 	{
@@ -1095,7 +1100,7 @@ stock SQL::OpenTable_Insert(const table[], bool:use_autoincrement = false, MySQL
 	SQL::UsedHandle[i] = true;
 	return i;
 }
-stock SQL::InsertIntEntry(handle, const field[], value)
+static stock SQL::InsertIntEntry(handle, const field[], value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
@@ -1110,7 +1115,7 @@ stock SQL::InsertIntEntry(handle, const field[], value)
 	SQL::upd_datacount[handle]++;
 	return 1;
 }
-stock SQL::InsertFloatEntry(handle, const field[], Float:value)
+static stock SQL::InsertFloatEntry(handle, const field[], Float:value)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
@@ -1125,7 +1130,7 @@ stock SQL::InsertFloatEntry(handle, const field[], Float:value)
 	SQL::upd_datacount[handle]++;
 	return 1;
 }
-stock SQL::InsertStringEntry(handle, const field[], const value[], bool:use_real_escape = true)
+static stock SQL::InsertStringEntry(handle, const field[], const value[], bool:use_real_escape = true)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
@@ -1149,7 +1154,8 @@ stock SQL::InsertStringEntry(handle, const field[], const value[], bool:use_real
 	SQL::upd_datacount[handle]++;
 	return 1;
 }
-stock SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+
+stock bool:SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	new query[85], Cache:result;
 	format(query, sizeof(query), "SHOW TABLES LIKE '%s'", tablename);
@@ -1158,9 +1164,9 @@ stock SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT
 	cache_delete(result);
 	if(rows > 0) 
 	{
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 stock SQL::CountRows(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
@@ -1172,10 +1178,10 @@ stock SQL::CountRows(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_H
 	cache_delete(result);
 	return rows;
 }
-stock SQL::RowExistsEx(const table[], const column[], const rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+stock SQL::RowExistsEx(const table[], const rowid_column[], const rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	new query[SQL_FORM_LENGTH], Cache:result;
-	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s` = '%e' ", table, column, rowID);
+	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s` = '%e' ", table, rowid_column, rowID);
 	result = mysql_query(connectionHandle, query);
 	if(!cache_is_valid(result)) return SQL_Error("(SQL::RowExistsEx) Invalid cache ID.");
 	new rows = cache_num_rows();
@@ -1220,11 +1226,11 @@ stock SQL::AddForeignKey(const o_table[], const f_table[], const o_key[], const 
 	mysql_tquery(connectionHandle, query, "", "");
 	return 0;
 }
-//ALTER TABLE `samp_house` ADD FOREIGN KEY (`ID`) REFERENCES `server`.`samp_bizz`(`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-stock SQL::RowExists(const table[], const column[], rowID[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+
+stock SQL::RowExists(const table[], const rowid_column[], rowID, MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	new query[SQL_FORM_LENGTH], Cache:result;
-	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s` = '%d' ", table, column, rowID);
+	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s` = '%d' ", table, rowid_column, rowID);
 	result = mysql_query(connectionHandle, query);
 	if(!cache_is_valid(result)) return SQL_Error("(SQL::RowExists) Invalid cache ID.");
 	new rows = cache_num_rows();
@@ -1247,14 +1253,9 @@ stock SQL::CountTables(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 
 
 //SQL::CacheReadAll(row, table[], MySQL:handle);
-
 #define CacheReadAll(%0,%1,%2); { new __str[128]; mysql_format(%2, __str, sizeof(__str), "SELECT * FROM %s", %1); \
 	new Cache:__cache = mysql_query(%2, __str); \
 	if(cache_is_valid(__cache)) { new __rows = cache_num_rows(); if(__rows) { for(new %0; %0 != __rows; %0++) { 
-
-#define CacheReadAll2(new %0 ||| %1,%2,%3); { new __str[128]; mysql_format(%3, __str, sizeof(__str), "SELECT * FROM %s", %2); \
-	new Cache:__cache = mysql_query(%3, __str); \
-	if(cache_is_valid(__cache)) { new __rows = cache_num_rows(); if(__rows) { for(%0 = %1; %0 != __rows; %0++) { 
 
 #define CacheCloseReadAll(); } cache_delete(__cache);}}}
 
@@ -1275,6 +1276,9 @@ stock SQL::CacheReadString(row, const column[], dest[], len = sizeof(dest))
 {
 	return cache_get_value_name(row, column, dest, len);
 }
+
+
+
 #undef SQL_INVALID_HANDLE
 #undef SQL_MAX_TABLE_NAME
 #undef SQL_MAX_HANDLES
