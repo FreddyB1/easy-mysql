@@ -37,10 +37,11 @@ stock ret_pName(playerid)
     GetPlayerName(playerid, name, sizeof(name)); 
     return name; 
 } 
+
 public OnGameModeInit() 
 { 
     //Connecting to the MySQL database 
-    SQL::Connect(mysql_host, mysql_user, mysql_db, mysql_pass); 
+    SQL::Connect(mysql_host, mysql_user, mysql_pass, mysql_db); 
     //Checking if the table 'players' exists 
      
     //Checking if the table 'players' exists 
@@ -59,6 +60,7 @@ public OnGameModeInit()
     } 
     return 1; 
 } 
+
 public OnPlayerConnect(playerid) 
 { 
     UserInfo[playerid][p_loggedin] = 0; UserInfo[playerid][p_score] = 0;  UserInfo[playerid][p_posx] = 1958.3783; 
@@ -80,11 +82,13 @@ public OnPlayerConnect(playerid)
     } 
     return 1; 
 } 
+
 public OnPlayerSpawn(playerid) 
 { 
     SetPlayerPos(playerid, UserInfo[playerid][p_posx], UserInfo[playerid][p_posy], UserInfo[playerid][p_posz]); 
     return 1; 
 } 
+
 public OnPlayerDisconnect(playerid, reason) 
 { 
     if(UserInfo[playerid][p_loggedin] == 1) 
@@ -100,6 +104,7 @@ public OnPlayerDisconnect(playerid, reason)
     } 
     return 1; 
 } 
+
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]) 
 { 
     switch(dialogid) 
