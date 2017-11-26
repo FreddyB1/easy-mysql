@@ -36,11 +36,11 @@ In order to use this include, you require the latest version of the [MySQL Plugi
 #define mysql_user    "root" 
 #define mysql_db        "server" 
 #define mysql_pass         "" 
-new MySQL_Handle;
+new MySQL:MySQL_Handle;
 
 public OnGameModeInit() 
 { 
-	MySQL_Handle = SQL::Connect(mysql_host, mysql_user, mysql_db, mysql_pass); 
+	MySQL_Handle = SQL::Connect(mysql_host, mysql_user, mysql_pass, mysql_db); 
 	return 1;
 }
 ```
