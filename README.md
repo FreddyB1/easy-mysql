@@ -109,7 +109,7 @@ SQL::ReadFloat(handle, "p_posz", UserInfo[playerid][p_posz]);
 SQL::Close(handle);
 ```
 
-Read all rows in a table:
+Reading all rows in a table:
 Example: reading all the rows in a faction system:
 ```pawn
 new handle = SQL::Open(SQL::MTREAD, "samp_factions");
