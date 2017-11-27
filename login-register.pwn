@@ -34,10 +34,6 @@ stock ret_pName(playerid)
     return name;
 }
 
-
-#define IsPlayerRegistered(%0)    (SQL::RowExistsEx(SQL_PLAYERS_TABLE, "p_name", ret_pName(%0)))
-
-
 main()
 {
     
@@ -69,7 +65,6 @@ public OnPlayerConnect(playerid)
 {
     UserInfo[playerid][p_loggedin] = 0; UserInfo[playerid][p_score] = 0;  UserInfo[playerid][p_posx] = 1958.3783;
     UserInfo[playerid][p_posy] = 1343.1572; UserInfo[playerid][p_posz] = 15.3746; 
-
 
     if(SQL::RowExistsEx(SQL_PLAYERS_TABLE, "p_name", ret_pName(playerid))) //Check if the name is registered in the database
     {
