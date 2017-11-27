@@ -137,3 +137,16 @@ SQL_ReadRetrievedRows(handle, i) //i represents the row number that's being read
 new rows = SQL::Close(handle); //returns the number of rows
 printf("[MYSQL] Factions loaded: %d", rows);
 ```
+##### For more information you can check the script and look at the available functions.
+
+### SQL::RowExists and SQL::RowExistsEx
+
+Returns 1 if the specific row exists and 0 if not.
+#### Example
+##### Checking if a player's name exists in a table called player's where the column name is "pname" and the rowidentifier is the player's name.
+```pawn
+if(SQL::RowExistsEx("samp_users", "pname", ret_pName(playerid))) 
+{
+    //prompt the player to a login dialog
+}
+```
