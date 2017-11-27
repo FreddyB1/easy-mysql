@@ -36,7 +36,7 @@ SQL::MTREAD
 ```
 
 ```pawn
-SQL::Open(SQL::qtypes:type, const table[], const column[] = "", row_identifier = -1, const column2[] = "", columnID2 = -1, const columnID3[] = "", limit = -1, limit2 = -1, const desc[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+SQL::Open(SQL::qtypes:type, const table[], const column_where[] = "", row_identifier = -1, const column_where2[] = "", row_identifier2 = -1, const row_identifier3[] = "", limit = -1, limit2 = -1, const desc[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 ```
 
 #### Parameters
@@ -49,10 +49,10 @@ const table[]
 ```
 ##### Specifies the name of the table the instruction will be executed at.
 ```pawn
-const column[] = ""
+const column_where[] = ""
 ```
 ##### If you're using the right type of instruction, specifies the name of the column for which you know the right row identifier value (row 
 ```pawn
 row_identifier 
 ```
-##### Specifies the row identifier, namely: Execute some MySQL instruction (WHERE column = row_identifer)
+##### Specifies the row identifier, namely: Execute some MySQL instruction (WHERE column_where = row_identifer)
