@@ -1,165 +1,58 @@
-#Easy-MySQL
+# Easy - MySQL V3.5
 
-Easy-MySQL is a plugin designed to simply the usage of MySQL queries, specially if you want to run long queries and you're not willing to create a lot of strings for it.
-
-#Download
-
-Go to the [releases page](https://github.com/ThreeKingz/easy-mysql/releases/tag/easy-mysql) and download the latest easy-mysql.inc file available.
+This include allows you to handle MySQL queries in a simplified way. This means that you won't need to write queries for the most part.
 
 
-#Installation
+## Installation:
 
-- Place the easy-mysql.inc file you downloaded in your includes folder.
-- Include the easy-mysql in your PAWN script.
-```pawn
-#include <easy-mysql> 
-```
-#Requirements:
+In order to use this include, you need the latest version of the MySQL plugin by BlueG, which can be obtained through the following link:
 
-In order to use this include, you require the latest version of the [MySQL Plugin](https://github.com/pBlueG/SA-MP-MySQL/releases) by BlueG.
+https://github.com/pBlueG/SA-MP-MySQL/releases
 
-#Functions and their usage:
-
-###SQL::Connect
-
-#####Description: 
-      Connects your script to a MySQL database with given parameters.
-####Parameters:
-```pawn
-(const host[], const user[], const database[], const password[], bool:debugging = false, port = 3306, bool:autoreconnect = true, pool_size = 2);´
-```
-####Return values:
-    Connection handle retrieved by mysql_connect.
+You simply need to place the latest release of easy-mysql.inc into your includes folder and include it in your script.
 
 ```pawn
-#define mysql_host    "localhost" 
-#define mysql_user    "root" 
-#define mysql_db        "server" 
-#define mysql_pass         "" 
-new MySQL:MySQL_Handle;
-
-public OnGameModeInit() 
-{ 
-	MySQL_Handle = SQL::Connect(mysql_host, mysql_user, mysql_pass, mysql_db); 
-	return 1;
-}
+#include <easy-mysql>
 ```
 
-###SQL::DeleteRow
+## Functions:
 
-#####Description: 
-      Deletes a row in the specified table.
-####Parameters:
+### SQL::Open
+This function allows to execute a defined type of MySQL command (SQL::qtypes).
+The following MySQL instructions are available (SQL::qtypes)
 ```pawn
-(const table[], const column[], columnID, connectionHandle = 1);
+SQL::UPDATE
+SQL::UPDATE2
+SQL::TUPDATE
+SQL::CREATE
+SQL::INSERT
+SQL::READ
+SQL::READ2
+SQL::TREAD
+SQL::CALLBACK
+SQL::MREAD
+SQL::MREAD2
+SQL::MTREAD
 ```
-* `const table[]`                 The target MySQL table.
-* `const column[]`                The column in the MySQL table.
-* `columnID`                      The unique ID that identifies the target row you want to delete.
-* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
-
-
-####Return values:
-    Always returns 1.
 
 ```pawn
-//Delete an user from a table called 'players', supposing the column is called 'p_id' and the player's column ID is 5.
-SQL::DeleteRow("players", "p_id", 5);
+SQL::Open(SQL::qtypes:type, const table[], const column[] = "", row_identifier = -1, const column2[] = "", columnID2 = -1, const columnID3[] = "", limit = -1, limit2 = -1, const desc[] = "", MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 ```
 
-
-###SQL::DeleteRowEx
-
-#####Description: 
-      Deletes a row in the specified table.
-####Parameters:
+#### Parameters
 ```pawn
-(const table[], const column[], columnID[], connectionHandle = 1);
+SQL::qtypes:type
 ```
-* `const table[]`                 The target MySQL table.
-* `const column[]`                The column in the MySQL table.
-* `columnID[]`                    The string that identifies the target row you want to delete(might be his name?).
-* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
-
-
-####Return values:
-    Always returns 1.
-
+##### Specifies the MySQL instruction you want to perform
 ```pawn
-//Delete an user from a table called 'players', supposing the column is called 'p_name' and the player's name is TestName.
-SQL::DeleteRowEx("players", "p_name", "TestName");
+const table[]
 ```
-
-
-###SQL::GetIntEntry
-
-#####Description: 
-      Gets an integer field in a defined row.
-####Parameters:
+##### Specifies the name of the table the instruction will be executed at.
 ```pawn
-(const table[], const field[], const column[], columnID, connectionHandle = 1);
+const column[] = ""
 ```
-* `const table[]`                 The target MySQL table.
-* `const field[]`                 The field to retrieve the integer from.
-* `const column[]`                The column that identifies the selected row.
-* `columnID`                    The ID in the column that identifies the selected row.
-* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
-
-
-####Return values:
-    The retrieved integer, 0 if no integer was found.
-
+##### If you're using the right type of instruction, specifies the name of the column for which you know the right row identifier value (row 
 ```pawn
-//Get an user's score from a table called 'players', supposing the score column is called 'p_score', the identifier column is called 'p_id' and the player's id is 4.
-new player_score = SQL::GetIntEntry("players", "p_score", "p_id", 4);
+row_identifier 
 ```
-
-###Float:SQL::GetFloatEntry
-
-#####Description: 
-      Gets a float field in a defined row.
-####Parameters:
-```pawn
-(const table[], const field[], const column[], columnID, connectionHandle = 1);
-```
-* `const table[]`                 The target MySQL table.
-* `const field[]`                 The field to retrieve the integer from.
-* `const column[]`                The column that identifies the selected row.
-* `columnID`                    The ID in the column that identifies the selected row.
-* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
-
-
-####Return values:
-    The retrieved float, 0 if no float was found.
-
-```pawn
-//Get an user's x_pos from a table called 'players', supposing the posx column is called 'p_X', the identifier column is called 'p_id' and the player's id is 4.
-new Float:playerX = SQL::GetFloatEntry("players", "p_X", "p_id", 4);
-```
-
-
-
-###SQL::GetIntEntryEx
-
-#####Description: 
-      Gets an integer field in a defined row.
-####Parameters:
-```pawn
-(const table[], const field[], const column[], columnID[], connectionHandle = 1);
-```
-* `const table[]`                 The target MySQL table.
-* `const field[]`                 The field to retrieve the integer from.
-* `const column[]`                The column that identifies the selected row.
-* `columnID[]`                    The string in the column that identifies the selected row(might be a player's name?).
-* `connectionHandle`              (optional)The handle returned by SQL::Connect or mysql_connect.
-
-
-####Return values:
-    The retrieved integer, 0 if no integer was found.
-
-```pawn
-//Get an user's score from a table called 'players', supposing the score column is called 'p_score', the identifier column is called 'p_name' and the player's name is TestName.
-new player_score = SQL::GetIntEntryEx("players", "p_score", "p_name", "TestName");
-```
-
-
+##### Specifies the row identifier, namely: Execute some MySQL instruction (WHERE column = row_identifer)
