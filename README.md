@@ -150,3 +150,4 @@ if(SQL::RowExistsEx("samp_users", "pname", ret_pName(playerid)))
     //prompt the player to a login dialog
 }
 ```
+More functions will be documented soon.
