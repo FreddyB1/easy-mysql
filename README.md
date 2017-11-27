@@ -62,7 +62,7 @@ row_identifier
 
 #### Example
 
-Checking if a table exists and if not creating a new table:
+##### Checking if a table exists and if not creating a new table:
 ```pawn
 //Checking if the table '"samp_users"' exists 
 if(!SQL::ExistsTable("samp_users")) 
@@ -80,7 +80,7 @@ if(!SQL::ExistsTable("samp_users"))
 } 
 ```
 
-Inserting data:
+##### Inserting data:
 ```pawn
 new handle = SQL::Open(SQL::INSERT, "samp_users"); 
 SQL::ToggleAutoIncrement(handle, true);//Toggles auto increment, SQL::Close will return cache_insert_id(); 
@@ -93,7 +93,7 @@ SQL::WriteFloat(handle, "p_posz", 0.0);
 SQL::Close(handle);
 ```
 
-Updating data:
+##### Updating data:
 ```pawn
 new handle = SQL::Open(SQL::UPDATE, "samp_users", "p_id", UserInfo[playerid][p_id]); 
 SQL::WriteInt(handle, "p_score", GetPlayerScore(playerid)); 
@@ -102,7 +102,7 @@ SQL::WriteFloat(handle, "p_posy", UserInfo[playerid][p_posy]);
 SQL::WriteFloat(handle, "p_posz", UserInfo[playerid][p_posz]); 
 SQL::Close(handle); 
 ```
-Reading data from a SINGLE row:
+##### Reading data from a SINGLE row:
 ```pawn
 new handle = SQL::Open(SQL::READ, "samp_users", "p_id", UserInfo[playerid][p_id]); 
 SQL::ReadInt(handle, "p_score", UserInfo[playerid][p_score]); 
@@ -112,8 +112,8 @@ SQL::ReadFloat(handle, "p_posz", UserInfo[playerid][p_posz]);
 SQL::Close(handle);
 ```
 
-Reading all rows in a table:
-Example: reading all the rows in a faction system:
+##### Reading all rows in a table:
+###### Example: reading all the rows in a faction system:
 ```pawn
 new handle = SQL::Open(SQL::MTREAD, "samp_factions");
 SQL_ReadRetrievedRows(handle, i) //i represents the row number that's being read
