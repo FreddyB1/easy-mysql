@@ -17,7 +17,10 @@ You simply need to place the latest release of easy-mysql.inc into your includes
 
 ## Functions:
 
-### SQL::Open
+### SQL::Open and SQL::OpenEx
+
+The only difference between those two functions is that SQL::Open takes an integer for argument as row_identifier and SQL::OpenEx a string (could be a player's name).
+
 This function allows to execute a defined type of MySQL command (SQL::qtypes).
 The following MySQL instructions are available (SQL::qtypes)
 ```pawn
