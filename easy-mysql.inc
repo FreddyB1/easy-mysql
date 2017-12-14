@@ -33,7 +33,7 @@ Credits:
 
 	Version: 3.6
 
-SQL_ReadRetrievedRows has been changed and now can be used as SQL::ReadRetrievedRows to match class-like syntax.
+SQL_ReadRetrievedRows has been changed and now can be used as SQL::ReadRetrievedRows to match the existing style.
 
 
 
