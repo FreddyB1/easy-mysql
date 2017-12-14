@@ -31,7 +31,9 @@ Credits:
  	Author: (current developer)
  	* eco1999 AKA Max_Andolini
 
-	Version: 3.5
+	Version: 3.6
+
+SQL_ReadRetrievedRows has been changed and now can be used as SQL::ReadRetrievedRows to match class-like syntax.
 
 
 
@@ -900,7 +902,7 @@ static stock SQL::InsertStringEntry(handle, const field[], const value[], bool:u
 Actual functions
 ================================================================================*/
 
-#define SQL_ReadRetrievedRows(%0,%1) if(IsMultiReadHandleValid(%0)) if(cache_num_rows()) for(new %1 = 0; %1 < cache_num_rows(); %1++)
+#define SQL_TReadRetrievedRows(%0,%1) if(IsMultiReadHandleValid(%0)) if(cache_num_rows()) for(new %1 = 0; %1 < cache_num_rows(); %1++)
 
 stock SQL::cache_get_value_name_int(row_idx, const column_where[])
 {
