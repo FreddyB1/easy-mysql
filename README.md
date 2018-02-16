@@ -116,7 +116,7 @@ SQL::Close(handle);
 ###### Example: reading all the rows in a faction system:
 ```pawn
 new handle = SQL::Open(SQL::MTREAD, "samp_factions");
-SQL_ReadRetrievedRows(handle, i) //i represents the row number that's being read
+SQL::ReadRetrievedRows(handle, i) //i represents the row number that's being read
 {
   SQL::ReadInt(handle, "f_dbID", FactionInfo[i][f_dbID], i);
   SQL::ReadInt(handle, "f_hasLeader", FactionInfo[i][f_hasLeader], i);
