@@ -188,7 +188,7 @@ static stock SQL::OpenTable_MultiRead(const table[], const column_where[] = "", 
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -251,7 +251,7 @@ static stock SQL::OpenTable_MultiRead2(const table[], const column_where[] = "",
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -304,7 +304,7 @@ static stock SQL::OpenTable_MultiReadEx(const table[], const column_where[] = ""
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -367,7 +367,7 @@ static stock SQL::OpenTable_MultiReadEx2(const table[], const column_where[] = "
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -399,7 +399,7 @@ static stock SQL::OpenTable_MultiTableRead(const table[], MySQL:connectionHandle
 	SQL::upd_type[i] = SQL::CALLBACK;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` ", table);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -460,7 +460,7 @@ static stock SQL::OpenTable_Read(const table[], const column_where[] = "", row_i
 	SQL::upd_type[i] = SQL::READ;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` WHERE `%s`='%d' ", table, column_where, row_identifier);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -513,7 +513,7 @@ static stock SQL::OpenTable_Read2(const table[], const column_where[] = "", row_
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -550,7 +550,7 @@ static stock SQL::OpenTable_ReadEx(const table[], const column_where[] = "", con
 	SQL::upd_type[i] = SQL::READ;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` WHERE `%s`='%s' ", table, column_where, row_identifier);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -603,7 +603,7 @@ static stock SQL::OpenTable_ReadEx2(const table[], const column_where[] = "", co
 	}
 	strcat(SQL::upd_form, " ");
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -635,7 +635,7 @@ static stock SQL::OpenTable_TableRead(const table[], MySQL:connectionHandle = MY
 	SQL::upd_type[i] = SQL::READ;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT * FROM `%s` ", table);
 	SQL::ReadCache[i] = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(SQL::ReadCache[i]) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1254,7 +1254,7 @@ stock SQL::GetIntEntry(const table[], const field[], const column_where[] = "", 
 	new Cache:result, int = 0, count;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%d' ", field, table, column_where, column_whereo, row_identifier);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1283,7 +1283,7 @@ stock SQL::GetIntEntry2(const table[], const field[], const column_where[] = "",
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1305,7 +1305,7 @@ stock Float:SQL::GetFloatEntry(const table[], const field[], const column_where[
 	;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%d' ", field, table, column_where, column_whereo, row_identifier);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1345,7 +1345,7 @@ stock Float:SQL::GetFloatEntry2(const table[], const field[], const column_where
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1370,7 +1370,7 @@ stock SQL::t_GetStringEntry(const table[], const field[], const column_where[] =
 	new Cache:result, count;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%d' ", field, table, column_where, column_whereo, row_identifier);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1397,7 +1397,7 @@ stock SQL::t_GetStringEntry2(const table[], const field[], const column_where[] 
 	new Cache:result, count;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%d' ", field, table, column_where, column_whereo, row_identifier);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1424,7 +1424,7 @@ stock SQL::GetStringEntry(const table[], const field[], const column_where[] = "
 	new Cache:result, count;
 	format(SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%d' ", field, table, column_where, column_whereo, row_identifier);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1462,7 +1462,7 @@ stock SQL::GetStringEntry2(const table[], const field[], const column_where[] = 
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1489,7 +1489,7 @@ stock SQL::GetStringEntryEx(const table[], const field[], const column_where[] =
 	new Cache:result, count;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%e' ", field, table, column_where, column_whereo, scolumn_where);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1527,7 +1527,7 @@ stock SQL::GetStringEntryEx2(const table[], const field[], const column_where[] 
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1554,7 +1554,7 @@ stock SQL::t_GetStringEntryEx(const table[], const field[], const column_where[]
 	new Cache:result, count;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%e' ", field, table, column_where, column_whereo, scolumn_where);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1592,7 +1592,7 @@ stock SQL::t_GetStringEntryEx2(const table[], const field[], const column_where[
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1619,7 +1619,7 @@ stock SQL::GetIntEntryEx(const table[], const field[], const column_where[] = ""
 	new Cache:result, int, count;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%e' ", field, table, column_where, column_whereo, scolumn_where);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1655,7 +1655,7 @@ stock SQL::GetIntEntryEx2(const table[], const field[], const column_where[] = "
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1680,7 +1680,7 @@ stock Float:SQL::GetFloatEntryEx(const table[], const field[], const column_wher
 	new Cache:result, Float:int, count;
 	mysql_format(connectionHandle, SQL::upd_form, sizeof(SQL::upd_form), "SELECT `%s` FROM `%s` WHERE `%s`%s'%e' ", field, table, column_where, column_whereo, scolumn_where);
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -1716,7 +1716,7 @@ stock Float:SQL::GetFloatEntryEx2(const table[], const field[], const column_whe
 	}
 	strcat(SQL::upd_form, " ");
 	result = mysql_query(connectionHandle, SQL::upd_form);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_form);
 	}
@@ -2094,7 +2094,7 @@ stock SQL::Close(handle)
 		{
 			new Cache:result;
 			result = mysql_query(connectionHandle, SQL::upd_query[handle]);
-			if(mysql_errno(result) != 0)
+			if(mysql_errno() != 0)
 			{
 				return SQL_Warning("Query could not be completed due to error: %s", SQL::upd_query[handle]);
 			}
@@ -2354,7 +2354,7 @@ stock SQL::TableExists(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT
 	new query[SQL_FORM_LENGTH], Cache:result, rows;
 	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` ", tablename);
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2372,7 +2372,7 @@ stock SQL::ExistsTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT
 	new query[85], Cache:result, rows;
 	format(query, sizeof(query), "SHOW TABLES LIKE '%s' ", tablename);
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2390,7 +2390,7 @@ stock SQL::CountRows(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_H
 	new query[SQL_FORM_LENGTH], Cache:result, rows;
 	format(query, sizeof(query), "SELECT * FROM `%s` ", tablename);
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2404,7 +2404,7 @@ stock SQL::RowExistsEx(const table[], const column_where[] = "", const row_ident
 	new query[SQL_FORM_LENGTH], Cache:result, rows;
 	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s`='%e' ", table, column_where, row_identifier);
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2433,7 +2433,7 @@ stock SQL::RowExistsEx2(const table[], const column_where[] = "", const row_iden
 	}
 	strcat(query, " ");
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2459,7 +2459,7 @@ stock SQL::RowExists(const table[], const column_where[] = "", row_identifier = 
 	new query[SQL_FORM_LENGTH], Cache:result, rows;
 	mysql_format(connectionHandle, query, sizeof(query),"SELECT * FROM `%s` WHERE `%s`='%d' ", table, column_where, row_identifier);
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2488,7 +2488,7 @@ stock SQL::RowExists2(const table[], const column_where[] = "", row_identifier =
 	}
 	strcat(query, " ");
 	result = mysql_query(connectionHandle, query);
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", query);
 	}
@@ -2505,7 +2505,7 @@ stock SQL::CountTables(MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	new Cache:result, rows;
 	result = mysql_query(connectionHandle, "SHOW TABLES");
-	if(mysql_errno(result) != 0)
+	if(mysql_errno() != 0)
 	{
 		return SQL_Warning("Query could not be completed due to error: %s", "SHOW TABLES");
 	}
