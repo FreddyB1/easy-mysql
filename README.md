@@ -1,4 +1,4 @@
-# Easy - MySQL V3.5
+# Easy - MySQL V3.7
 
 This include allows you to handle MySQL queries in a simplified way. This means that you won't need to write queries for the most part.
 
@@ -69,13 +69,13 @@ if(!SQL::ExistsTable("samp_users"))
 { 
     //If not, then create a table called '"samp_users"'. 
     new handle = SQL::Open(SQL::CREATE, "samp_users"); //Opening a valid handle to create the table
-    SQL::AddTableEntry(handle, "p_id", SQL_TYPE_INT, 11, true); 
-    SQL::AddTableEntry(handle, "p_name", SQL_TYPE_VCHAR, 24, .setindex = true); 
-    SQL::AddTableEntry(handle, "p_password", SQL_TYPE_VCHAR, 64); 
-    SQL::AddTableEntry(handle, "p_score", SQL_TYPE_INT); 
-    SQL::AddTableEntry(handle, "p_posx", SQL_TYPE_FLOAT); 
-    SQL::AddTableEntry(handle, "p_posy", SQL_TYPE_FLOAT); 
-    SQL::AddTableEntry(handle, "p_posz", SQL_TYPE_FLOAT); 
+    SQL::AddTableColumn(handle, "p_id", SQL_TYPE_INT, 11, false, true); 
+    SQL::AddTableColumn(handle, "p_name", SQL_TYPE_VCHAR, 24, .setindex = true); 
+    SQL::AddTableColumn(handle, "p_password", SQL_TYPE_VCHAR, 64); 
+    SQL::AddTableColumn(handle, "p_score", SQL_TYPE_INT); 
+    SQL::AddTableColumn(handle, "p_posx", SQL_TYPE_FLOAT); 
+    SQL::AddTableColumn(handle, "p_posy", SQL_TYPE_FLOAT); 
+    SQL::AddTableColumn(handle, "p_posz", SQL_TYPE_FLOAT); 
     SQL::Close(handle);//Closing the previous opened handle. 
 } 
 ```
