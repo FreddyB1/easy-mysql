@@ -1,30 +1,44 @@
 /*
-                                                                          _             ____        _____
-                                                                         | |           |___ \      | ____|
-   ___    __ _   ___   _   _   ______   _ __ ___    _   _   ___    __ _  | |   __   __   __) |     | |__
-  / _ \  / _` | / __| | | | | |______| | '_ ` _ \  | | | | / __|  / _` | | |   \ \ / /  |__ <      |___
- |  __/ | (_| | \__ \ | |_| |          | | | | | | | |_| | \__ \ | (_| | | |    \ V /   ___) |  _   ___) |
-  \___|  \__,_| |___/  \__, |          |_| |_| |_|  \__, | |___/  \__, | |_|     \_/   |____/  (_) |____/
-                        __/ |                        __/ |           | |
-                       |___/                        |___/            |_|
+                                                                          _             ____        ______ 
+                                                                         | |           |___ \      |____  |
+   ___    __ _   ___   _   _   ______   _ __ ___    _   _   ___    __ _  | |   __   __   __) |         / / 
+  / _ \  / _` | / __| | | | | |______| | '_ ` _ \  | | | | / __|  / _` | | |   \ \ / /  |__ <         / /  
+ |  __/ | (_| | \__ \ | |_| |          | | | | | | | |_| | \__ \ | (_| | | |    \ V /   ___) |  _    / /   
+  \___|  \__,_| |___/  \__, |          |_| |_| |_|  \__, | |___/  \__, | |_|     \_/   |____/  (_)  /_/    
+                        __/ |                        __/ |           | |                                   
+                       |___/                        |___/            |_| 
+					   
 Portions of this code are Copyright (C) 2015 ThreeKingz the Original Author
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+	
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
 Credits:
 	Original Author: (creator)
  	* Freddy Borja - ThePhenix AKA ThreeKingz
-
  	Author: (current developer)
  	* eco1999 AKA Max_Andolini
-	Version: 3.6
-SQL_ReadRetrievedRows has been changed and now can be used as SQL::ReadRetrievedRows to match the existing style.
+	Version: 3.7
+	
+Bugs solved.
+Added insert options. (Engine, Charset etc.)
+Added Charset function in SQL::Connect.
+Added Null or not null option in AddTableColumn.
+
+SQL::Connect(const host[], const user[], const password[], const database[], const charset[] = "latin5", debugging = 0, port = 3306, bool:autoreconnect = true, pool_size = 2);
+
+new handle = SQL::Open(SQL::CREATE, "database", "engine default InnoDB", -1, "charset default latin5");
+SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:null = false, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false)
+SQL::Close(handle);
+
 */
 
 #if defined _tksql_included//Avoid including it again!
@@ -97,6 +111,8 @@ static stock
 	Cache:SQL::ReadCache[SQL_MAX_HANDLES],
 	bool:SQL::upd_useautoincrement[SQL_MAX_HANDLES],
     SQL::primarykey[SQL_MAX_HANDLES][64],
+	SQL::engine[SQL_MAX_HANDLES][64],
+	SQL::charset[SQL_MAX_HANDLES][64],
     SQL::index_set[SQL_MAX_HANDLES][SQL_MAX_INDEXES],
     SQL::index[SQL_MAX_HANDLES][SQL_MAX_INDEXES][64],
 	SQL::isset_primarykey[SQL_MAX_HANDLES]
@@ -414,7 +430,7 @@ static stock SQL::OpenTable_MultiTableRead(const table[], MySQL:connectionHandle
 	return SQL_INVALID_HANDLE;
 }
 
-static stock SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
+static stock SQL::CreateTable(const tablename[], const engine[], const charset[] = "latin5",  MySQL:connectionHandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(strlen(tablename) > SQL_MAX_TABLE_NAME)
 	{
@@ -431,6 +447,8 @@ static stock SQL::CreateTable(const tablename[], MySQL:connectionHandle = MYSQL_
 	SQL::upd_type[i] = SQL::CREATE;
 	SQL::upd_connectionHandle[i] = connectionHandle;
 	strcpy(SQL::upd_table[i], tablename);
+	strcpy(SQL::engine[i], engine);
+	strcpy(SQL::charset[i], charset);
 	format(SQL::upd_query[i], SQL_MAX_QUERY_LENGTH, "CREATE TABLE %s (", SQL::upd_table[i]);
 	SQL::upd_datacount[i] = 0;
 	SQL::isset_primarykey[i] = 0;
@@ -964,7 +982,7 @@ stock Float:SQL::cache_get_value_name_float(row_idx, const column_where[])
 	cache_get_value_name_float(row_idx, column_where, fval);
 	return fval;
 }
-stock MySQL:SQL::Connect(const host[], const user[], const password[], const database[], debugging = 0, port = 3306, bool:autoreconnect = true, pool_size = 2)
+stock MySQL:SQL::Connect(const host[], const user[], const password[], const database[], const charset[] = "latin5", debugging = 0, port = 3306, bool:autoreconnect = true, pool_size = 2)
 {
 	switch(debugging)
 	{
@@ -989,6 +1007,7 @@ stock MySQL:SQL::Connect(const host[], const user[], const password[], const dat
 	mysql_set_option(options, AUTO_RECONNECT, autoreconnect);
 	mysql_set_option(options, POOL_SIZE, pool_size);
 	new MySQL:SQL::mc = mysql_connect(host, user, password, database, options);
+	mysql_set_charset(charset);
 	if(mysql_errno(SQL::mc) != 0)
 	{
 		SQL_Warning("Could not connect to database %s on host %s | user %s and password %s", database, host, user, password);
@@ -1094,7 +1113,7 @@ stock SQL::Open(SQL::qtypes:type, const table[], const column_where[] = "", row_
 	{
 		case SQL::CREATE:
 		{
-			handle = SQL::CreateTable(table, connectionHandle);
+		    handle = SQL::CreateTable(table, (isnull(column_where)) ? "InnoDB" : column_where, (isnull(column_where2)) ? "latin5" : column_where2, connectionHandle);
 		}
 		case SQL::READ:
 		{
@@ -1147,7 +1166,7 @@ stock SQL::OpenEx(SQL::qtypes:type, const table[], const column_where[] = "", co
 	{
 		case SQL::CREATE:
 		{
-			handle = SQL::CreateTable(table, connectionHandle);
+			handle = SQL::CreateTable(table, (isnull(column_where)) ? "InnoDB" : column_where, (isnull(column_where2)) ? "latin5" : column_where2, connectionHandle);
 		}
 		case SQL::READ:
 		{
@@ -1192,8 +1211,6 @@ stock SQL::OpenEx(SQL::qtypes:type, const table[], const column_where[] = "", co
 	}
 	return handle;
 }
-
-
 
 stock SQL::ToggleAutoIncrement(handle, bool:toggle)
 {
@@ -1736,7 +1753,7 @@ stock Float:SQL::GetFloatEntryEx2(const table[], const field[], const column_whe
 	return int;
 }
 
-stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false)
+stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL_TYPE_INT, maxlength = 11, bool:null = false, bool:auto_increment = false, bool:setprimary = false, bool:setindex = false)
 {
 	if(!SQL::IsValidUpdatingSlot(handle))
 	{
@@ -1760,7 +1777,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 		{
 			if(auto_increment == true && setprimary == false)
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int %s AUTO_INCREMENT,", field_name, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 				SQL::isset_primarykey[handle] = 1;
@@ -1768,7 +1785,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			}
 			else if(auto_increment == true && setprimary == true)
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL AUTO_INCREMENT,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int %s PRIMARY KEY AUTO_INCREMENT,", field_name, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 				SQL::isset_primarykey[handle] = 1;
@@ -1776,7 +1793,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			}
 			else if(setprimary == true)
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int NOT NULL PRIMARY KEY,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int %s PRIMARY KEY,", field_name, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 				SQL::isset_primarykey[handle] = 2;
@@ -1784,7 +1801,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			}
 			else
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int(%d) NOT NULL,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s int(%d) %s,", field_name, maxlength, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 			}
@@ -1794,7 +1811,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			if(auto_increment == true) return 0;
 			if(setprimary == true)
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL PRIMARY KEY,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) %s PRIMARY KEY,", field_name, maxlength, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 				SQL::isset_primarykey[handle] = 2;
@@ -1802,7 +1819,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			}
 			else
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) NOT NULL,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s varchar(%d) %s,", field_name, maxlength, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 
@@ -1813,7 +1830,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			if(auto_increment == true) return 0;
 			if(setprimary == true)
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL PRIMARY KEY,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) %s PRIMARY KEY,", field_name, maxlength, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 				SQL::isset_primarykey[handle] = 2;
@@ -1821,7 +1838,7 @@ stock SQL::AddTableColumn(handle, const field_name[], SQL::datatypes: type = SQL
 			}
 			else
 			{
-				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) NOT NULL,", field_name, maxlength);
+				format(SQL::upd_form, sizeof(SQL::upd_form), "%s float(%d) %s,", field_name, maxlength, (null == false) ? "NOT NULL" : "NULL");
 				strcat(SQL::upd_query[handle], SQL::upd_form);
 				SQL::upd_datacount[handle]++;
 			}
@@ -2058,11 +2075,14 @@ stock SQL::Close(handle)
 			format(SQL::upd_form, 128, ",primary key (%s)", SQL::primarykey[handle]);
 			strcat(SQL::upd_query[handle], SQL::upd_form);
 		}
-		strcat(SQL::upd_query[handle], ");");
+		format(SQL::upd_form, 128, ") ENGINE=%s DEFAULT CHARSET=%s;", SQL::engine[handle], SQL::charset[handle]);
+		strcat(SQL::upd_query[handle], SQL::upd_form);
 		mysql_tquery(connectionHandle, SQL::upd_query[handle], "", "");
 		SQL::upd_table[handle][0] = '\0';
 		//SQL::upd_connectionHandle[handle] = MYSQL_INVALID_HANDLE;
 		SQL::primarykey[handle][0] = '\0';
+		SQL::engine[handle][0] = '\0';
+		SQL::charset[handle][0] = '\0';
 		SQL::isset_primarykey[handle] = false;
 		SQL::upd_query[handle][0] = '\0';
 		SQL::upd_rowidentifier[handle][0] = '\0';
