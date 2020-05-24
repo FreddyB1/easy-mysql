@@ -1,4 +1,4 @@
-# Easy - MySQL V3.7
+# Easy - MySQL V3.8
 
 This include allows you to handle MySQL queries in a simplified way. This means that you won't need to write queries for the most part.
 
