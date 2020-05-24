@@ -1017,7 +1017,7 @@ stock MySQL:SQL::Connect(const host[], const user[], const password[], const dat
 
 stock SQL::Disconnect(MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
 {
-	return mysql_close(handle);
+	return mysql_close(connectionhandle);
 }
 
 stock SQL::Begin(MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
