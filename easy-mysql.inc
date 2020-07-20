@@ -2189,6 +2189,35 @@ stock SQL::SetIntEntry2(const table[], const field[], value, const column_where[
 	return 1;
 }
 
+stock SQL::SetIntEntry3(const table[], const field[], const field_value[], value, const column_where[] = "", row_identifier = -1, MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
+{
+	if(!table[0]) return 0;
+	if(!field[0]) return 0;
+	mysql_format(MySQL:connectionhandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`=`%s`+'%d' WHERE `%s`='%d' ", table, field, field_value, value, column_where, row_identifier);
+	mysql_tquery(MySQL:connectionhandle, SQL::upd_form, "", "");
+	return 1;
+}
+
+stock SQL::SetIntEntry4(const table[], const field[], const field_value[], value, const column_where[] = "", row_identifier = -1, const column_where2[] = "", row_identifier2 = -1, const row_identifier3[] = "", MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
+{
+	if(!table[0]) return 0;
+	if(!field[0]) return 0;
+	mysql_format(MySQL:connectionhandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`=`%s`+'%d' WHERE `%s`='%d' ", table, field, field_value, value, column_where, row_identifier);
+	if(!isnull(column_where2) && row_identifier2 != -1 && isnull(row_identifier3))
+	{
+		mysql_format(MySQL:connectionhandle, SQL::upd_form2, sizeof(SQL::upd_form2), " AND `%s`='%d'", column_where2, row_identifier2);
+		strcat(SQL::upd_form, SQL::upd_form2);
+	}
+	if(!isnull(column_where2) && !isnull(row_identifier3) && row_identifier2 == -1)
+	{
+		mysql_format(MySQL:connectionhandle, SQL::upd_form2, sizeof(SQL::upd_form2), " AND `%s`='%s'", column_where2, row_identifier3);
+		strcat(SQL::upd_form, SQL::upd_form2);
+	}
+	strcat(SQL::upd_form, " ");
+	mysql_tquery(MySQL:connectionhandle, SQL::upd_form, "", "");
+	return 1;
+}
+
 stock SQL::SetIntEntryEx(const table[], const field[], value, const column_where[] = "", const row_identifier[] = "", MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
 {
 	if(!table[0]) return 0;
@@ -2203,6 +2232,35 @@ stock SQL::SetIntEntryEx2(const table[], const field[], value, const column_wher
 	if(!table[0]) return 0;
 	if(!field[0]) return 0;
 	mysql_format(MySQL:connectionhandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`='%d' WHERE `%s`='%e'", table, field, value, column_where, row_identifier);
+	if(!isnull(column_where2) && !isnull(row_identifier2) && row_identifier3 == -1)
+	{
+		mysql_format(MySQL:connectionhandle, SQL::upd_form2, sizeof(SQL::upd_form2), " AND `%s`='%e'", column_where2, row_identifier2);
+		strcat(SQL::upd_form, SQL::upd_form2);
+	}
+	if(!isnull(column_where2) && row_identifier3 != -1 && isnull(row_identifier2))
+	{
+		mysql_format(MySQL:connectionhandle, SQL::upd_form2, sizeof(SQL::upd_form2), " AND `%s`='%d'", column_where2, row_identifier3);
+		strcat(SQL::upd_form, SQL::upd_form2);
+	}
+	strcat(SQL::upd_form, " ");
+	mysql_tquery(MySQL:connectionhandle, SQL::upd_form, "", "");
+	return 1;
+}
+
+stock SQL::SetIntEntryEx3(const table[], const field[], const field_value[], value, const column_where[] = "", const row_identifier[] = "", MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
+{
+	if(!table[0]) return 0;
+	if(!field[0]) return 0;
+	mysql_format(MySQL:connectionhandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`=`%s`+'%d' WHERE `%s`='%e' ", table, field, field_value, value, column_where, row_identifier);
+	mysql_tquery(MySQL:connectionhandle, SQL::upd_form, "", "");
+	return 1;
+}
+
+stock SQL::SetIntEntryEx4(const table[], const field[], const field_value[], value, const column_where[] = "", const row_identifier[] = "", const column_where2[] = "", const row_identifier2[] = "", row_identifier3 = -1, MySQL:connectionhandle = MYSQL_DEFAULT_HANDLE)
+{
+	if(!table[0]) return 0;
+	if(!field[0]) return 0;
+	mysql_format(MySQL:connectionhandle, SQL::upd_form, sizeof(SQL::upd_form), "UPDATE `%s` SET `%s`=`%s`+'%d' WHERE `%s`='%e' ", table, field, field_value, value, column_where, row_identifier);
 	if(!isnull(column_where2) && !isnull(row_identifier2) && row_identifier3 == -1)
 	{
 		mysql_format(MySQL:connectionhandle, SQL::upd_form2, sizeof(SQL::upd_form2), " AND `%s`='%e'", column_where2, row_identifier2);
