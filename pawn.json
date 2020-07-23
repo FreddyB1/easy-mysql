@@ -1,0 +1,7 @@
+{
+  "user": "ThreeKingz",
+  "repo": "easy-mysql",
+  "entry": "login-register.pwn",
+  "output": "login-register.amx",
+  "dependencies": ["pBlueG/SA-MP-MySQL"]
+}
